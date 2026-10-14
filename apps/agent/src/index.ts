@@ -1,10 +1,10 @@
 import Fastify from 'fastify';
 import { LlmClient } from '@agents-platform/clients';
 import { registerAgentRoutes } from './http/routes.js';
-import { BasicRagRuntime } from './runtimes/basic-rag-runtime.js';
+import { createAgentRuntime } from './runtime-registry.js';
 
 const llm = new LlmClient(process.env.LLM_URL ?? 'http://localhost:4102');
-const runtime = new BasicRagRuntime({
+const runtime = createAgentRuntime(process.env.AGENT_RUNTIME ?? 'basic-rag', {
   vectorStore: { search: async () => [] },
   llm: {
     complete: async (input) => {

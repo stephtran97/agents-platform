@@ -1,7 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { agentRequestSchema, type AgentRequest, type AgentResponse } from '@agents-platform/contracts';
-
-export type AgentRuntime = { answer(request: AgentRequest): Promise<AgentResponse> };
+import type { AgentRuntime } from '../runtime-registry.js';
 
 export async function registerAgentRoutes(app: FastifyInstance, runtime: AgentRuntime): Promise<void> {
   app.get('/health', async () => ({ ok: true }));
