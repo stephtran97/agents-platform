@@ -77,7 +77,9 @@ describe('processIngestionJob', () => {
     expect(f.vectors.size).toBe(2);
     expect(f.vectorStore.upsertChunks.mock.calls[0]?.[2]).toEqual(f.vectorStore.upsertChunks.mock.calls[1]?.[2]);
     await f.processor.processIngestionJob(job.id);
-    expect(f.embeddings.embed).toHaveBeenCalledTimes(3);
+    expect(f.embeddings.embed).toHaveBeenCalledTimes(2);
+    expect(f.vectorStore.upsertChunks).toHaveBeenCalledTimes(2);
+    expect(f.jobs.claimPending).toHaveBeenCalledTimes(3);
   });
 
   it('preserves tenant scope when reading and writing', async () => {
