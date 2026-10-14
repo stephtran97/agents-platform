@@ -20,9 +20,19 @@ importers:
 
   apps/agent:
     dependencies:
+      '@agents-platform/clients':
+        specifier: workspace:*
+        version: link:../../packages/clients
       '@agents-platform/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      fastify:
+        specifier: ^5.6.1
+        version: 5.12.7
+    devDependencies:
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.19.2)
 
   apps/api:
     dependencies:

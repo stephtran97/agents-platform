@@ -1,6 +1,6 @@
 import type { AgentRequest, AgentResponse } from '@agents-platform/contracts';
 export type RetrievedChunk = { chunkId: string; documentId: string; content: string; filename: string; score: number; startOffset?: number; endOffset?: number };
-export type AgentDependencies = { vectorStore: { search(input: { tenantId: string; knowledgeBaseIds: string[]; query: string; limit: number }): Promise<RetrievedChunk[]> }; llm: { complete(input: { model: string; messages: AgentRequest['messages'] }): Promise<{ message: { role: 'assistant'; content: string }; model: string; finishReason: 'stop'; usage: { promptTokens: number; completionTokens: number; totalTokens: number } }> } };
+export type AgentDependencies = { vectorStore: { search(input: { tenantId: string; knowledgeBaseIds: string[]; query: string; limit: number }): Promise<RetrievedChunk[]> }; llm: { complete(input: { model: string; messages: AgentRequest['messages'] }): Promise<{ message: { content: string }; model: string; finishReason: 'stop'; usage: { promptTokens: number; completionTokens: number; totalTokens: number } }> } };
 export class BasicRagRuntime {
   constructor(private readonly deps: AgentDependencies) {}
   async answer(request: AgentRequest): Promise<AgentResponse> {
