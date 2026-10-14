@@ -48,6 +48,15 @@ export class PostgresJobRepository implements JobRepository {
     return result.rows[0] ? toJob(result.rows[0]) : null;
   }
 
+  async claimPending(jobId: string): Promise<IngestionJob | null> {
+    const result = await this.pool.query<JobRow>(
+      `UPDATE ingestion_jobs SET status = 'processing', attempts = attempts + 1, updated_at = now()
+       WHERE id = $1 AND status = 'queued' RETURNING *`,
+      [jobId],
+    );
+    return result.rows[0] ? toJob(result.rows[0]) : null;
+  }
+
   async markRunning(context: TenantContext, jobId: string): Promise<IngestionJob | null> {
     const result = await this.pool.query<JobRow>(
       `UPDATE ingestion_jobs SET status = 'processing', attempts = attempts + 1, updated_at = now()
