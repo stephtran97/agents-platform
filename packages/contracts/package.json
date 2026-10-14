@@ -2,5 +2,8 @@
   "name": "@agents-platform/contracts",
   "version": "0.1.0",
   "private": true,
+  "types": "src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "zod": "^4.1.12" },
   "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" }
 }
