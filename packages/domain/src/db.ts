@@ -1,8 +1,8 @@
 import { readFile, readdir } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import type { Pool } from 'pg';
 
-const migrationsDirectory = fileURLToPath(new URL('./migrations/', import.meta.url));
+const migrationsDirectory = join(__dirname, 'migrations');
 
 /** Apply each numbered migration once, serializing concurrent runners with a transaction lock. */
 export async function migrate(pool: Pool): Promise<void> {
@@ -16,7 +16,7 @@ export async function migrate(pool: Pool): Promise<void> {
     const completed = new Set(applied.rows.map(row => row.name));
     for (const name of files) {
       if (completed.has(name)) continue;
-      await client.query(await readFile(fileURLToPath(new URL(`./migrations/${name}`, import.meta.url)), 'utf8'));
+      await client.query(await readFile(join(migrationsDirectory, name), 'utf8'));
       await client.query('INSERT INTO schema_migrations (name) VALUES ($1)', [name]);
     }
     await client.query('COMMIT');
