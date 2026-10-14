@@ -1,0 +1,19 @@
+{
+  "name": "agents-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "dev": "docker compose up --wait",
+    "build": "pnpm --recursive --if-present build",
+    "test": "vitest run",
+    "typecheck": "pnpm --recursive typecheck",
+    "test:integration": "vitest run tests/integration",
+    "smoke:infra": "node scripts/wait-for-infrastructure.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
