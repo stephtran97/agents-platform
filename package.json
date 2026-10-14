@@ -8,7 +8,7 @@
     "build": "pnpm --recursive --if-present build",
     "test": "vitest run",
     "typecheck": "pnpm --recursive typecheck",
-    "test:integration": "vitest run tests/integration",
+    "test:integration": "vitest run --pool=threads --maxWorkers=1 --minWorkers=1",
     "smoke:infra": "node scripts/wait-for-infrastructure.ts"
   },
   "devDependencies": {
