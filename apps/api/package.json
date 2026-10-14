@@ -2,5 +2,6 @@
   "name": "@agents-platform/api",
   "version": "0.1.0",
   "private": true,
-  "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" }
+  "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" },
+  "dependencies": { "@agents-platform/contracts": "workspace:*", "@agents-platform/clients": "workspace:*", "fastify": "^5.12.7" }
 }
