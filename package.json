@@ -9,7 +9,7 @@
     "test": "vitest run",
     "typecheck": "pnpm --recursive typecheck",
     "test:integration": "vitest run tests/integration",
-    "smoke:infra": "node scripts/wait-for-infrastructure.mjs"
+    "smoke:infra": "node scripts/wait-for-infrastructure.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
