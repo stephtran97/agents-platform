@@ -100,10 +100,16 @@ importers:
       pdf-parse:
         specifier: 1.1.1
         version: 1.1.1
+      pg:
+        specifier: ^8.16.3
+        version: 8.23.1
     devDependencies:
       '@types/pdf-parse':
         specifier: 1.1.5
         version: 1.1.5
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
 
   packages/clients:
     dependencies:
