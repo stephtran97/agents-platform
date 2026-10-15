@@ -4,6 +4,7 @@
   "private": true,
   "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" },
   "dependencies": {
+    "@agents-platform/clients": "workspace:*",
     "@agents-platform/domain": "workspace:*",
     "mammoth": "1.9.1",
     "pdf-parse": "1.1.1"
