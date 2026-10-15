@@ -1,0 +1,4 @@
+import type { AgentResponse } from '@agents-platform/contracts';
+const apiBase = '';
+export async function createConversation(): Promise<{ id: string }> { const response = await fetch(`${apiBase}/v1/conversations`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-tenant-id': 'local' } }); if (!response.ok) throw new Error('CONVERSATION_UNAVAILABLE'); return response.json(); }
+export async function sendMessage(conversationId: string, message: string): Promise<AgentResponse> { const response = await fetch(`${apiBase}/v1/conversations/${conversationId}/messages`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-tenant-id': 'local' }, body: JSON.stringify({ message, knowledgeBaseIds: ['default'] }) }); if (!response.ok) throw new Error('AGENT_UNAVAILABLE'); return response.json(); }

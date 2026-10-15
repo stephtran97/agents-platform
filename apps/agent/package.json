@@ -1,0 +1,8 @@
+{
+  "name": "@agents-platform/agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" },
+  "dependencies": { "@agents-platform/clients": "workspace:*", "@agents-platform/contracts": "workspace:*", "@agents-platform/domain": "workspace:*", "fastify": "^5.6.1", "pg": "^8.16.3" },
+  "devDependencies": { "vitest": "^3.2.4" }
+}
