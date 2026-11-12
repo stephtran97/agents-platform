@@ -103,4 +103,34 @@ describe('tenant-scoped PostgreSQL adapters', () => {
     await vectors.deleteDocument(tenantA.tenantId, kbA, documentId);
     expect(await vectors.search(tenantA.tenantId, [kbA], embedding, 10)).toEqual([]);
   });
+
+  it('lists stored chunks per tenant and removes chunks and jobs when a document is deleted', async () => {
+    const embedding = Array.from({ length: 1536 }, (_, i) => (i === 0 ? 1 : 0));
+    const chunks = [1, 0].map((ordinal) => ({
+      id: randomUUID(),
+      documentId,
+      ordinal,
+      text: `chunk ${ordinal}`,
+      embedding
+    }));
+    await vectors.upsertChunks(tenantA.tenantId, kbA, chunks);
+    await jobs.create(tenantA, { id: randomUUID(), documentId });
+
+    expect(
+      (await vectors.listDocumentChunks(tenantA.tenantId, kbA, documentId)).map((c) => c.ordinal)
+    ).toEqual([0, 1]);
+    expect(await vectors.listDocumentChunks(tenantB.tenantId, kbA, documentId)).toEqual([]);
+
+    expect(await documents.delete(tenantB, documentId)).toBe(false);
+    expect(await documents.getById(tenantA, documentId)).not.toBeNull();
+
+    expect(await documents.delete(tenantA, documentId)).toBe(true);
+    expect(await documents.getById(tenantA, documentId)).toBeNull();
+    expect(await vectors.listDocumentChunks(tenantA.tenantId, kbA, documentId)).toEqual([]);
+    const remaining = await pool.query('SELECT 1 FROM ingestion_jobs WHERE document_id = $1', [
+      documentId
+    ]);
+    expect(remaining.rowCount).toBe(0);
+    expect(await documents.delete(tenantA, documentId)).toBe(false);
+  });
 });

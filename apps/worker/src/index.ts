@@ -6,11 +6,9 @@ import {
   PostgresJobRepository,
   migrate
 } from '@agents-platform/domain';
+import { createDefaultExtractors, defaultChunkOptions } from '@agents-platform/ingestion';
 import { Pool } from 'pg';
 import { LlmEmbeddingClient } from './embedding/embedding-client.js';
-import { DocxExtractor } from './extractors/docx-extractor.js';
-import { PdfExtractor } from './extractors/pdf-extractor.js';
-import { PlainTextExtractor } from './extractors/plain-text-extractor.js';
 import { createIngestionJobProcessor } from './jobs/process-ingestion-job.js';
 import { createPollingWorker } from './worker.js';
 
@@ -36,8 +34,8 @@ async function main(): Promise<void> {
     embeddings: new LlmEmbeddingClient(
       new LlmClient(process.env.LLM_URL ?? 'http://localhost:4102')
     ),
-    extractors: [new PlainTextExtractor(), new PdfExtractor(), new DocxExtractor()],
-    chunkOptions: { maxCharacters: 1200, overlapCharacters: 120 }
+    extractors: createDefaultExtractors(),
+    chunkOptions: defaultChunkOptions
   });
   const controller = new AbortController();
   process.once('SIGTERM', () => controller.abort());

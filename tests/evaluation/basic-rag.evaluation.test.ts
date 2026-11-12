@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { chunkText } from '../../apps/worker/src/chunking/chunker.js';
+import { chunkText } from '../../packages/ingestion/src/index.js';
 import { MockProvider } from '../../apps/llm/src/providers/mock-provider.js';
 import {
   BasicRagRuntime,

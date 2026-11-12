@@ -21,7 +21,8 @@ function build() {
       },
       getById: async () => null,
       listByTenant: async () => [],
-      updateStatus: async () => null
+      updateStatus: async () => null,
+      delete: async () => false
     },
     conversations: {
       create: async (context: { tenantId: string }, c: { id: string }) => ({
@@ -34,6 +35,7 @@ function build() {
     } as never,
     jobs: { create: async () => ({}) } as never,
     objectStore: { put: async () => 'key' } as never,
+    vectorStore: { listDocumentChunks: async () => [] },
     tenantScopes: {
       ensureTenant: async (context) => {
         ensured.push(context.tenantId);

@@ -5,9 +5,8 @@ import type {
   ObjectStore,
   VectorStore
 } from '@agents-platform/domain';
-import { chunkText } from '../chunking/chunker.js';
+import { chunkText, type DocumentExtractor } from '@agents-platform/ingestion';
 import type { EmbeddingClient } from '../embedding/embedding-client.js';
-import type { DocumentExtractor } from '../extractors/extractor.js';
 
 export interface IngestionJobDependencies {
   jobs: Pick<JobRepository, 'claimPending' | 'markSucceeded' | 'markFailed'>;

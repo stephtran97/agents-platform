@@ -45,3 +45,19 @@ it('rejects embeddings with the wrong dimension before querying', async () => {
   await expect(store.search('tenant', ['kb'], [1], 5)).rejects.toThrow(/1536/);
   expect(queried).toBe(false);
 });
+
+it('scopes stored-chunk listing to tenant, knowledge base and document in ordinal order', async () => {
+  const calls: Array<{ sql: string; values: unknown[] }> = [];
+  const pool = {
+    query: async (sql: string, values: unknown[]) => {
+      calls.push({ sql, values });
+      return { rows: [{ id: 'c', document_id: 'doc', ordinal: 0, text: 'hello' }] };
+    }
+  } as unknown as Pool;
+  const chunks = await new PgVectorStore(pool).listDocumentChunks('tenant', 'kb', 'doc');
+  expect(chunks).toEqual([{ id: 'c', documentId: 'doc', ordinal: 0, text: 'hello' }]);
+  expect(calls[0]?.sql).toMatch(
+    /tenant_id = \$1.*knowledge_base_id = \$2.*document_id = \$3.*ORDER BY ordinal/s
+  );
+  expect(calls[0]?.values).toEqual(['tenant', 'kb', 'doc']);
+});

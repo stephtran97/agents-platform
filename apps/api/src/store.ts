@@ -1,12 +1,20 @@
 import { randomUUID } from 'node:crypto';
+import type { DocumentInspectionDto } from '@agents-platform/contracts';
+import {
+  createDefaultExtractors,
+  defaultChunkOptions,
+  type DocumentExtractor
+} from '@agents-platform/ingestion';
 import type {
   ConversationRepository,
   DocumentRepository,
   JobRepository,
   ObjectStore,
-  TenantScopeRepository
+  TenantScopeRepository,
+  VectorStore
 } from '@agents-platform/domain';
 import type { Conversation, Document } from '@agents-platform/domain';
+import { buildInspection, type ChunkOptions } from './document-inspection.js';
 
 export type ApiDocument = Pick<
   Document,
@@ -24,6 +32,9 @@ export type ApiStore = {
     sizeBytes: number;
     content?: Buffer;
   }): Promise<ApiDocument>;
+  /** Deletes the document with its stored file, chunks and jobs. False when absent in the tenant. */
+  deleteDocument(tenantId: string, id: string): Promise<boolean>;
+  inspectDocument(tenantId: string, id: string): Promise<DocumentInspectionDto | null>;
   createConversation(tenantId: string): Promise<ApiConversation>;
   getConversation(tenantId: string, id: string): Promise<ApiConversation | null>;
   addMessage(
@@ -35,8 +46,13 @@ export type ApiStore = {
   listMessages(tenantId: string, conversationId: string): Promise<ApiMessage[]>;
 };
 
-export function createMemoryStore(): ApiStore {
+export function createMemoryStore(
+  options: { extractors?: readonly DocumentExtractor[]; chunkOptions?: ChunkOptions } = {}
+): ApiStore {
+  const extractors = options.extractors ?? createDefaultExtractors();
+  const chunkOptions = options.chunkOptions ?? defaultChunkOptions;
   const documents: ApiDocument[] = [];
+  const contents = new Map<string, Buffer>();
   const conversations: ApiConversation[] = [];
   const messages: Array<ApiMessage & { tenantId: string; conversationId: string }> = [];
   return {
@@ -56,7 +72,34 @@ export function createMemoryStore(): ApiStore {
         createdAt: new Date().toISOString()
       };
       documents.push(document);
+      if (input.content) contents.set(document.id, input.content);
       return document;
+    },
+    deleteDocument: async (tenantId, id) => {
+      const index = documents.findIndex(
+        (document) => document.tenantId === tenantId && document.id === id
+      );
+      if (index < 0) return false;
+      documents.splice(index, 1);
+      contents.delete(id);
+      return true;
+    },
+    inspectDocument: async (tenantId, id) => {
+      const document = documents.find(
+        (candidate) => candidate.tenantId === tenantId && candidate.id === id
+      );
+      if (!document) return null;
+      return buildInspection({
+        document,
+        loadContent: async () => {
+          const content = contents.get(id);
+          if (!content) throw new Error('Document has no stored content');
+          return content;
+        },
+        extractors,
+        chunkOptions,
+        storedChunks: []
+      });
     },
     createConversation: async (tenantId) => {
       const conversation = { id: randomUUID(), tenantId, createdAt: new Date().toISOString() };
@@ -103,7 +146,12 @@ export function createPersistentStore(deps: {
   jobs: JobRepository;
   objectStore: ObjectStore;
   tenantScopes: TenantScopeRepository;
+  vectorStore: Pick<VectorStore, 'listDocumentChunks'>;
+  extractors?: readonly DocumentExtractor[];
+  chunkOptions?: ChunkOptions;
 }): ApiStore {
+  const extractors = deps.extractors ?? createDefaultExtractors();
+  const chunkOptions = deps.chunkOptions ?? defaultChunkOptions;
   return {
     listDocuments: async (tenantId) =>
       (await deps.documents.listByTenant({ tenantId })).map(mapDocument),
@@ -132,6 +180,29 @@ export function createPersistentStore(deps: {
       );
       await deps.jobs.create({ tenantId: input.tenantId }, { id: randomUUID(), documentId: id });
       return mapDocument(document);
+    },
+    deleteDocument: async (tenantId, id) => {
+      const document = await deps.documents.getById({ tenantId }, id);
+      if (!document) return false;
+      // Chunks, embeddings and jobs are removed by the database cascade on the document row.
+      if (!(await deps.documents.delete({ tenantId }, id))) return false;
+      await deps.objectStore.delete(document.objectKey);
+      return true;
+    },
+    inspectDocument: async (tenantId, id) => {
+      const document = await deps.documents.getById({ tenantId }, id);
+      if (!document) return null;
+      return buildInspection({
+        document: mapDocument(document),
+        loadContent: () => deps.objectStore.get(document.objectKey),
+        extractors,
+        chunkOptions,
+        storedChunks: await deps.vectorStore.listDocumentChunks(
+          tenantId,
+          document.knowledgeBaseId,
+          id
+        )
+      });
     },
     createConversation: async (tenantId) => {
       await deps.tenantScopes.ensureTenant({ tenantId });

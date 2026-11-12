@@ -10,12 +10,10 @@
   "dependencies": {
     "@agents-platform/clients": "workspace:*",
     "@agents-platform/domain": "workspace:*",
-    "mammoth": "1.9.1",
-    "pdf-parse": "1.1.1",
+    "@agents-platform/ingestion": "workspace:*",
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@types/pdf-parse": "1.1.5",
     "@types/pg": "^8.23.1"
   }
 }

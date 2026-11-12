@@ -1,0 +1,21 @@
+{
+  "name": "@agents-platform/ingestion",
+  "version": "0.1.0",
+  "private": true,
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "mammoth": "1.9.1",
+    "pdf-parse": "1.1.1"
+  },
+  "scripts": {
+    "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p ../../tsconfig.base.json"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "1.1.5"
+  }
+}

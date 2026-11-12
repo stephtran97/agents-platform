@@ -30,6 +30,20 @@ export function createApp(
     );
     return document ? document : reply.code(404).send({ code: 'DOCUMENT_NOT_FOUND' });
   });
+  app.delete('/v1/documents/:id', async (request, reply) => {
+    const deleted = await store.deleteDocument(
+      tenantId(request),
+      (request.params as { id: string }).id
+    );
+    return deleted ? reply.code(204).send() : reply.code(404).send({ code: 'DOCUMENT_NOT_FOUND' });
+  });
+  app.get('/v1/documents/:id/chunks', async (request, reply) => {
+    const inspection = await store.inspectDocument(
+      tenantId(request),
+      (request.params as { id: string }).id
+    );
+    return inspection ? inspection : reply.code(404).send({ code: 'DOCUMENT_NOT_FOUND' });
+  });
   app.post('/v1/documents', async (request, reply) => {
     const body = (request.body ?? {}) as {
       filename?: string;

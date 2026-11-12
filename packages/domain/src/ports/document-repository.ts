@@ -16,4 +16,6 @@ export interface DocumentRepository {
     id: string,
     status: DocumentStatus
   ): Promise<Document | null>;
+  /** Deletes the document (cascading to chunks and jobs). Returns false when absent in the tenant. */
+  delete(context: TenantContext, id: string): Promise<boolean>;
 }

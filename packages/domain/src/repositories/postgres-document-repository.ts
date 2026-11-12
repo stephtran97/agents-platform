@@ -79,4 +79,12 @@ export class PostgresDocumentRepository implements DocumentRepository {
     );
     return result.rows[0] ? toDocument(result.rows[0]) : null;
   }
+
+  async delete(context: TenantContext, id: string): Promise<boolean> {
+    const result = await this.pool.query('DELETE FROM documents WHERE tenant_id = $1 AND id = $2', [
+      context.tenantId,
+      id
+    ]);
+    return (result.rowCount ?? 0) > 0;
+  }
 }

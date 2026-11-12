@@ -36,3 +36,27 @@ export const ingestionJobSchema = z.object({
   createdAt: z.string().datetime()
 });
 export type IngestionJobDto = z.infer<typeof ingestionJobSchema>;
+
+export const documentInspectionChunkSchema = z.object({
+  id: z.string().min(1),
+  ordinal: z.number().int().nonnegative(),
+  text: z.string(),
+  /** Source offsets in `extractedText`; null when the stored chunk no longer matches a re-chunk. */
+  startOffset: z.number().int().nonnegative().nullable(),
+  endOffset: z.number().int().nonnegative().nullable()
+});
+export type DocumentInspectionChunkDto = z.infer<typeof documentInspectionChunkSchema>;
+
+export const documentInspectionSchema = z.object({
+  document: documentSchema,
+  /** Text re-extracted from the stored file; null when extraction failed. */
+  extractedText: z.string().nullable(),
+  extractionError: z.string().optional(),
+  chunkOptions: z.object({
+    maxCharacters: z.number().int().positive(),
+    overlapCharacters: z.number().int().nonnegative()
+  }),
+  /** The chunks stored for retrieval, i.e. what the agent actually searches. */
+  chunks: z.array(documentInspectionChunkSchema)
+});
+export type DocumentInspectionDto = z.infer<typeof documentInspectionSchema>;

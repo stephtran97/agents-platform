@@ -1,6 +1,11 @@
 import type { Pool, QueryResultRow } from 'pg';
 import { EMBEDDING_DIMENSION } from '../ports/vector-store.js';
-import type { DocumentChunkInput, VectorSearchResult, VectorStore } from '../ports/vector-store.js';
+import type {
+  DocumentChunkInput,
+  StoredChunk,
+  VectorSearchResult,
+  VectorStore
+} from '../ports/vector-store.js';
 
 interface SearchRow extends QueryResultRow {
   id: string;
@@ -84,6 +89,30 @@ export class PgVectorStore implements VectorStore {
       text: row.text,
       score: row.score,
       filename: row.filename ?? undefined
+    }));
+  }
+
+  async listDocumentChunks(
+    tenantId: string,
+    knowledgeBaseId: string,
+    documentId: string
+  ): Promise<StoredChunk[]> {
+    const result = await this.pool.query<{
+      id: string;
+      document_id: string;
+      ordinal: number;
+      text: string;
+    }>(
+      `SELECT id, document_id, ordinal, text FROM document_chunks
+       WHERE tenant_id = $1 AND knowledge_base_id = $2 AND document_id = $3
+       ORDER BY ordinal`,
+      [tenantId, knowledgeBaseId, documentId]
+    );
+    return result.rows.map((row) => ({
+      id: row.id,
+      documentId: row.document_id,
+      ordinal: row.ordinal,
+      text: row.text
     }));
   }
 

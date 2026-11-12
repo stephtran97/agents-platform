@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   createConversation,
+  deleteDocument,
+  getDocumentInspection,
   listDocuments,
   sendMessage,
   uploadDocument,
   type DocumentSummary
 } from './api/client.js';
 import { ChatPanel } from './components/ChatPanel.js';
+import { DocumentDetail } from './components/DocumentDetail.js';
 import { DocumentList } from './components/DocumentList.js';
 import { DocumentUploader } from './components/DocumentUploader.js';
 
@@ -14,7 +17,14 @@ const pollMs = 2000;
 
 export function App() {
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const conversationId = useRef<Promise<string> | null>(null);
+
+  async function handleDelete(id: string) {
+    await deleteDocument(id);
+    setDocuments((current) => current.filter((document) => document.id !== id));
+    setSelectedId((current) => (current === id ? null : current));
+  }
 
   const refresh = useCallback(async () => {
     try {
@@ -66,8 +76,16 @@ export function App() {
       </header>
       <section className="panel documents-panel">
         <DocumentUploader onUpload={handleUpload} />
-        <DocumentList documents={documents} />
+        <DocumentList documents={documents} selectedId={selectedId} onSelect={setSelectedId} />
       </section>
+      {selectedId && (
+        <DocumentDetail
+          documentId={selectedId}
+          load={getDocumentInspection}
+          onDelete={handleDelete}
+          onClose={() => setSelectedId(null)}
+        />
+      )}
       <ChatPanel
         ask={ask}
         disabled={!hasReady}

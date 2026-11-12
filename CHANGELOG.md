@@ -5,6 +5,8 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 ## [Unreleased]
 
 ### Added
+- Manage uploaded documents in the web app: click a document to see its extracted text beside the chunks the agent searches (chunk boundaries and overlaps highlighted), and delete it with confirmation.
+- `DELETE /v1/documents/:id` removes a document with its stored file, chunks, embeddings and ingestion jobs; `GET /v1/documents/:id/chunks` returns the re-extracted text and stored chunks.
 - Shared VS Code settings (`.vscode`) that format with Prettier and fix ESLint issues on save.
 - ESLint (typescript-eslint, react-hooks) and Prettier with `pnpm lint`, `lint:fix`, `format` and `format:check` scripts; a Husky pre-commit hook runs lint-staged on staged files.
 
@@ -19,6 +21,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 - Document upload and conversations no longer fail against PostgreSQL: documents are filed under a per-tenant default knowledge base UUID (created on demand) instead of the invalid `'default'`, and non-UUID tenant keys such as `local` are mapped to stable tenant UUIDs.
 
 ### Changed
+- Text extractors and the chunker moved from `apps/worker` into the shared `@agents-platform/ingestion` package so the API and worker use the same chunking.
 - Reformatted the codebase with Prettier and removed unused imports flagged by ESLint.
 - Compose publishes Postgres on `${POSTGRES_PORT:-5432}` so it can avoid a local PostgreSQL on the same port.
 - Compose no longer publishes the agent and LLM ports; only web and API are public.

@@ -1,4 +1,4 @@
-import type { AgentResponse, DocumentDto } from '@agents-platform/contracts';
+import type { AgentResponse, DocumentDto, DocumentInspectionDto } from '@agents-platform/contracts';
 
 const apiBase = '';
 const headers = { 'content-type': 'application/json', 'x-tenant-id': 'local' };
@@ -53,4 +53,23 @@ export async function sendMessage(conversationId: string, message: string): Prom
   });
   if (!response.ok) throw new Error('AGENT_UNAVAILABLE');
   return response.json();
+}
+
+export type DocumentInspection = DocumentInspectionDto;
+
+export async function getDocumentInspection(id: string): Promise<DocumentInspection> {
+  const response = await fetch(`${apiBase}/v1/documents/${encodeURIComponent(id)}/chunks`, {
+    headers
+  });
+  if (!response.ok) throw new Error('DOCUMENT_UNAVAILABLE');
+  return response.json();
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  const response = await fetch(`${apiBase}/v1/documents/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers
+  });
+  // A 404 means it is already gone, which is the outcome the caller wants.
+  if (!response.ok && response.status !== 404) throw new Error('DELETE_FAILED');
 }

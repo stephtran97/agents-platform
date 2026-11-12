@@ -2,6 +2,7 @@ import { AgentClient } from '@agents-platform/clients';
 import {
   MinioObjectStore,
   PostgresConversationRepository,
+  PgVectorStore,
   PostgresDocumentRepository,
   PostgresJobRepository,
   PostgresTenantScopeRepository,
@@ -19,6 +20,7 @@ export async function createPersistentApp() {
     conversations: new PostgresConversationRepository(pool),
     jobs: new PostgresJobRepository(pool),
     tenantScopes: new PostgresTenantScopeRepository(pool),
+    vectorStore: new PgVectorStore(pool),
     objectStore: new MinioObjectStore({
       endpoint: process.env.S3_ENDPOINT ?? 'http://localhost:9000',
       bucket: process.env.S3_BUCKET ?? 'agents-documents',
