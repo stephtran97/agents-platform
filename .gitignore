@@ -8,3 +8,5 @@ coverage/
 .pnpm-store/
 *.tsbuildinfo
 .worktrees/
+test-results/
+playwright-report/
