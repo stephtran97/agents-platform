@@ -74,6 +74,8 @@ pnpm exec vitest run tests/evaluation tests/integration
 pnpm test:e2e   # Playwright, API stubbed
 ```
 
+Integration tests share a database with the live worker, so run them serially with `pnpm test:integration`. If a local PostgreSQL already uses port 5432, start Compose with `POSTGRES_PORT=5433` and set `DATABASE_URL=postgres://agents:agents@localhost:5433/agents` for host-side tests. `pnpm test:e2e` also runs `e2e/real-stack.e2e.ts` (real upload, ingestion and cited answer through the browser) and skips it when the API is not running.
+
 In Compose only the web (`5173`) and API (`4100`) ports are published; the agent and LLM services are reachable only on the internal network. To switch behaviour, set `AGENT_RUNTIME` / `LLM_PROVIDER` in `.env` and recreate the containers.
 
 Never commit `.env`, credentials, or provider API keys. Use `.env.example` as the sanitized configuration reference.

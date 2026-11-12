@@ -59,7 +59,7 @@ test('asks a question and shows the answer with its sources', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Sources' }).locator('xpath=following-sibling::ul[1]/li')).toHaveText('policy.md · chunk-7');
   expect(requests).toEqual([
-    { tenant: 'local', body: { message: 'What is the refund policy?', knowledgeBaseIds: ['default'] } },
+    { tenant: 'local', body: { message: 'What is the refund policy?' } },
   ]);
 });
 

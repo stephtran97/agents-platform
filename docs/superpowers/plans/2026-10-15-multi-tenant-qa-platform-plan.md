@@ -59,31 +59,31 @@
 - Produces local services `postgres` and `minio` with health checks and named volumes.
 - Produces environment names used by later tasks: `DATABASE_URL`, `S3_ENDPOINT`, `S3_BUCKET`, `AGENT_URL`, `LLM_URL`, `TENANT_ID`, `LLM_PROVIDER`, and `AGENT_RUNTIME`.
 
-- [ ] **Step 1: Write the failing workspace smoke test**
+- [x] **Step 1: Write the failing workspace smoke test**
 
   Assert the workspace package manifest exposes `build`, `test`, and `typecheck`, and that each app/package directory has a `package.json` with a `typecheck` script.
 
-- [ ] **Step 2: Run the smoke test to verify it fails**
+- [x] **Step 2: Run the smoke test to verify it fails**
 
   Run: `pnpm exec vitest run tests/smoke/workspace.test.ts`
 
   Expected: FAIL because the workspace files do not exist.
 
-- [ ] **Step 3: Implement the workspace skeleton**
+- [x] **Step 3: Implement the workspace skeleton**
 
   Add pnpm workspace metadata, shared TypeScript compiler settings, package scripts, `.env.example`, and Docker Compose services. Keep application source files empty until their owning tasks.
 
-- [ ] **Step 4: Add local infrastructure health checks**
+- [x] **Step 4: Add local infrastructure health checks**
 
   Configure PostgreSQL with pgvector and MinIO with persistent named volumes. Add a smoke script that waits for both health checks.
 
-- [ ] **Step 5: Run the smoke test and typecheck**
+- [x] **Step 5: Run the smoke test and typecheck**
 
   Run: `pnpm exec vitest run tests/smoke/workspace.test.ts && pnpm typecheck`
 
   Expected: PASS with all workspace packages discoverable.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   `git add package.json pnpm-workspace.yaml tsconfig.base.json .gitignore .env.example docker-compose.yml apps packages tests/smoke/workspace.test.ts && git commit -m "chore: initialize TypeScript monorepo"`
 
@@ -110,31 +110,31 @@
 - Produces Zod schemas and inferred TypeScript types for every HTTP boundary.
 - Produces `loadConfig(env: NodeJS.ProcessEnv): AppConfig` and `TenantContext`.
 
-- [ ] **Step 1: Write contract tests**
+- [x] **Step 1: Write contract tests**
 
   Test valid parsing for upload metadata, agent requests/responses, LLM completion/embedding requests, citations, stable error codes, and rejection of missing `tenantId` on tenant-owned requests.
 
-- [ ] **Step 2: Run contract tests to verify they fail**
+- [x] **Step 2: Run contract tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/contracts test`
 
   Expected: FAIL because schemas and exports do not exist.
 
-- [ ] **Step 3: Implement the schemas and types**
+- [x] **Step 3: Implement the schemas and types**
 
   Use Zod as the runtime authority. Define `AgentRuntime` and `LlmProvider` interfaces in the service packages later; this package contains only transport-safe request/response shapes and domain enums.
 
-- [ ] **Step 4: Implement environment validation**
+- [x] **Step 4: Implement environment validation**
 
   `loadConfig` must require service URLs and database/object-storage settings, apply local defaults for `TENANT_ID`, `AGENT_RUNTIME=basic-rag`, and `LLM_PROVIDER=mock`, and reject invalid URLs or empty secrets where a real provider is selected.
 
-- [ ] **Step 5: Run contract and config tests**
+- [x] **Step 5: Run contract and config tests**
 
   Run: `pnpm --filter @agents-platform/contracts test && pnpm --filter @agents-platform/config test && pnpm typecheck`
 
   Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   `git add packages/contracts packages/domain packages/config && git commit -m "feat: add shared contracts and configuration"`
 
@@ -164,31 +164,31 @@
 - `VectorStore.upsertChunks`, `search`, and `deleteDocument` require `tenantId` and knowledge-base scope.
 - `ObjectStore.put`, `get`, and `delete` use opaque object keys and never expose provider-specific types.
 
-- [ ] **Step 1: Write integration tests against PostgreSQL and MinIO**
+- [x] **Step 1: Write integration tests against PostgreSQL and MinIO**
 
   Assert tenant-scoped reads cannot return another tenant’s document, vector search filters by `tenantId` and `knowledgeBaseId`, object upload/download round-trips, and claiming a job twice returns it only once.
 
-- [ ] **Step 2: Run integration tests to verify they fail**
+- [x] **Step 2: Run integration tests to verify they fail**
 
   Run: `pnpm test:integration -- packages/domain/src/repositories/postgres-repositories.integration.test.ts packages/domain/src/storage/minio-object-store.integration.test.ts`
 
   Expected: FAIL because migrations and adapters do not exist.
 
-- [ ] **Step 3: Implement migrations and ports**
+- [x] **Step 3: Implement migrations and ports**
 
   Create tables for tenants, users, knowledge bases, documents, document chunks, conversations, messages, agent/model config, and ingestion jobs. Add tenant-aware indexes and a pgvector column with a documented embedding dimension constant.
 
-- [ ] **Step 4: Implement repository and storage adapters**
+- [x] **Step 4: Implement repository and storage adapters**
 
   Use parameterized SQL. Enforce tenant filters in repository methods rather than relying on callers. Use MinIO through the S3-compatible client and make object keys include tenant and document identifiers.
 
-- [ ] **Step 5: Run integration tests and typecheck**
+- [x] **Step 5: Run integration tests and typecheck**
 
   Run: `docker compose up -d postgres minio; pnpm test:integration -- packages/domain/src/repositories/postgres-repositories.integration.test.ts packages/domain/src/storage/minio-object-store.integration.test.ts; pnpm typecheck`
 
   Expected: PASS with no cross-tenant rows or vectors observable.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   `git add packages/domain && git commit -m "feat: add tenant-scoped persistence ports"`
 
@@ -213,35 +213,35 @@
 - `chunkText(text: string, options: ChunkOptions): DocumentChunkDraft[]` with deterministic ordering and source offsets.
 - `processIngestionJob(jobId: string): Promise<void>` claims one job, extracts text, chunks it, asks the LLM service for embeddings, upserts vectors, and updates job/document status.
 
-- [ ] **Step 1: Write chunker tests**
+- [x] **Step 1: Write chunker tests**
 
   Test stable chunk IDs/order, configured maximum size, overlap, preservation of source offsets, empty text rejection, and Unicode text.
 
-- [ ] **Step 2: Write worker tests for failure and idempotency**
+- [x] **Step 2: Write worker tests for failure and idempotency**
 
   Test unsupported MIME type produces `DOCUMENT_UNSUPPORTED`, extractor failure produces `INGESTION_FAILED`, a successful retry does not duplicate chunks, and each failed job is persisted as failed with a message.
 
-- [ ] **Step 3: Run worker tests to verify they fail**
+- [x] **Step 3: Run worker tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/worker test`
 
   Expected: FAIL because extractors, chunker, and job processor do not exist.
 
-- [ ] **Step 4: Implement extraction and chunking**
+- [x] **Step 4: Implement extraction and chunking**
 
   Support TXT first, then PDF and DOCX using focused extractor adapters. Keep extraction output independent of the source library. Use deterministic chunk IDs derived from document ID and ordinal.
 
-- [ ] **Step 5: Implement the polling worker**
+- [x] **Step 5: Implement the polling worker**
 
   Poll `JobRepository.claimNextPending`, process one job at a time by default, and release no duplicate work after a crash by using job status/attempt fields. Consume the local `EmbeddingClient` port; Task 5 supplies the production adapter through the LLM HTTP client, while unit tests inject a deterministic fake.
 
-- [ ] **Step 6: Run worker tests and typecheck**
+- [x] **Step 6: Run worker tests and typecheck**
 
   Run: `pnpm --filter @agents-platform/worker test && pnpm typecheck`
 
   Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
   `git add apps/worker && git commit -m "feat: add document ingestion worker"`
 
@@ -268,39 +268,39 @@
 - `createLlmProvider(config: LlmConfig): LlmProvider`.
 - `LlmClient.complete`, `embed`, and `listModels` are typed HTTP clients used by agent and worker.
 
-- [ ] **Step 1: Write provider and gateway tests**
+- [x] **Step 1: Write provider and gateway tests**
 
   Assert the mock provider is deterministic, provider selection uses `LLM_PROVIDER`, invalid provider names fail at startup, request schemas reject missing model/input, and provider errors become `MODEL_UNAVAILABLE`.
 
-- [ ] **Step 2: Add timeout tests**
+- [x] **Step 2: Add timeout tests**
 
   Use a hanging fake provider and assert the gateway returns a stable timeout error within the configured deadline.
 
-- [ ] **Step 3: Run LLM tests to verify they fail**
+- [x] **Step 3: Run LLM tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/llm test`
 
   Expected: FAIL because the registry, adapters, and routes do not exist.
 
-- [ ] **Step 4: Implement the provider interface and mock provider**
+- [x] **Step 4: Implement the provider interface and mock provider**
 
   The mock provider must return deterministic embeddings and a deterministic completion suitable for citation tests; it must never require network access.
 
-- [ ] **Step 5: Implement real provider adapters**
+- [x] **Step 5: Implement real provider adapters**
 
   Translate OpenAI and Azure OpenAI SDK requests into the shared contracts. Keep API keys and endpoint configuration inside the LLM service.
 
-- [ ] **Step 6: Implement Fastify routes and typed client**
+- [x] **Step 6: Implement Fastify routes and typed client**
 
   Add health, `POST /v1/completions`, `POST /v1/embeddings`, and `GET /v1/models`. Normalize all provider errors and enforce request timeouts.
 
-- [ ] **Step 7: Run tests and typecheck**
+- [x] **Step 7: Run tests and typecheck**
 
   Run: `pnpm --filter @agents-platform/llm test && pnpm typecheck`
 
   Expected: PASS with the mock provider and no real credentials required.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
   `git add apps/llm packages/clients/src/llm-client.ts && git commit -m "feat: add replaceable LLM gateway"`
 
@@ -328,39 +328,39 @@
 - `createAgentRuntime(name: string, dependencies: AgentDependencies): AgentRuntime`.
 - `AgentClient.answer(request: AgentRequest): Promise<AgentResponse>`.
 
-- [ ] **Step 1: Write retrieval and prompt tests**
+- [x] **Step 1: Write retrieval and prompt tests**
 
   Assert tenant/knowledge-base scope is forwarded to the vector store, result ordering is stable, prompts label sources, and empty retrieval yields an explicit no-context prompt.
 
-- [ ] **Step 2: Write runtime tests**
+- [x] **Step 2: Write runtime tests**
 
   Assert the basic runtime retrieves chunks, calls the LLM client once with grounded context, maps source chunks to citations, returns `traceId`, and produces a no-answer response with empty citations when no relevant context exists.
 
-- [ ] **Step 3: Run agent tests to verify they fail**
+- [x] **Step 3: Run agent tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/agent test`
 
   Expected: FAIL because retrieval, runtime, and routes do not exist.
 
-- [ ] **Step 4: Implement retrieval and prompt construction**
+- [x] **Step 4: Implement retrieval and prompt construction**
 
   Keep prompt construction independent of any provider SDK. Include document ID, chunk ID, filename, and offsets in the internal source metadata used to build citations.
 
-- [ ] **Step 5: Implement `basic-rag` and runtime registry**
+- [x] **Step 5: Implement `basic-rag` and runtime registry**
 
   Select the runtime from `AGENT_RUNTIME`, inject the vector store and `LlmClient`, and translate downstream failures to stable agent errors.
 
-- [ ] **Step 6: Implement agent HTTP routes and client**
+- [x] **Step 6: Implement agent HTTP routes and client**
 
   Add health and `POST /v1/answer`; validate all requests with shared Zod schemas and preserve the incoming trace ID or create one.
 
-- [ ] **Step 7: Run tests and typecheck**
+- [x] **Step 7: Run tests and typecheck**
 
   Run: `pnpm --filter @agents-platform/agent test && pnpm typecheck`
 
   Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
   `git add apps/agent packages/clients/src/agent-client.ts && git commit -m "feat: add basic RAG agent service"`
 
@@ -386,35 +386,35 @@
 - `ConversationService.ask(context, request): Promise<AgentResponse>`.
 - Public routes: `POST /v1/documents`, `GET /v1/documents`, `GET /v1/documents/:id`, `POST /v1/conversations`, `POST /v1/conversations/:id/messages`, and health endpoints.
 
-- [ ] **Step 1: Write service tests**
+- [x] **Step 1: Write service tests**
 
   Assert uploads store the file, create tenant-owned metadata and an ingestion job, conversation messages persist before/after agent calls as designed, and agent failures produce stable API errors.
 
-- [ ] **Step 2: Write tenant-isolation route tests**
+- [x] **Step 2: Write tenant-isolation route tests**
 
   Assert a request cannot select another tenant by body, query string, or path value; the development identity is the only source of tenant context.
 
-- [ ] **Step 3: Run API tests to verify they fail**
+- [x] **Step 3: Run API tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/api test`
 
   Expected: FAIL because services and routes do not exist.
 
-- [ ] **Step 4: Implement development identity and document routes**
+- [x] **Step 4: Implement development identity and document routes**
 
   Use `TENANT_ID` as the fixed local identity. Validate MIME type/size before object storage, generate a document ID, and enqueue an ingestion job in the same database transaction as metadata.
 
-- [ ] **Step 5: Implement conversation routes**
+- [x] **Step 5: Implement conversation routes**
 
   Validate conversation ownership, pass only server-derived tenant context to the agent client, persist user/assistant messages, and return citations and trace metadata.
 
-- [ ] **Step 6: Run API tests and typecheck**
+- [x] **Step 6: Run API tests and typecheck**
 
   Run: `pnpm --filter @agents-platform/api test && pnpm typecheck`
 
   Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
   `git add apps/api && git commit -m "feat: add public Q&A API"`
 
@@ -528,19 +528,19 @@
 
   Remove only the project’s named Docker volumes after confirming their exact names, restart from a clean checkout state, and run the documented setup and test commands.
 
-- [ ] **Step 2: Verify replaceability**
+- [x] **Step 2: Verify replaceability**
 
   Run the deterministic suite once with `AGENT_RUNTIME=basic-rag` and `LLM_PROVIDER=mock`; verify provider selection and runtime selection are configuration changes, not source edits.
 
-- [ ] **Step 3: Verify failure paths**
+- [x] **Step 3: Verify failure paths**
 
   Exercise unsupported upload, failed embedding, LLM timeout, empty retrieval, and duplicate job retry. Confirm stable error codes and no cross-tenant data.
 
-- [ ] **Step 4: Record evidence**
+- [x] **Step 4: Record evidence**
 
   Write commands, pass/fail output summaries, known prototype limitations, and the recommended next sub-project (production authentication/multi-tenancy) in the verification note.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
   `git add README.md docs/superpowers/verification/2026-10-15-multi-tenant-qa-platform-verification.md && git commit -m "docs: record prototype verification"`
 

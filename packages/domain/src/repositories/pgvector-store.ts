@@ -8,6 +8,7 @@ interface SearchRow extends QueryResultRow {
   knowledge_base_id: string;
   ordinal: number;
   text: string;
+  filename: string | null;
   score: number;
 }
 
@@ -45,17 +46,18 @@ export class PgVectorStore implements VectorStore {
     const vector = vectorLiteral(embedding);
     if (knowledgeBaseIds.length === 0 || limit <= 0) return [];
     const result = await this.pool.query<SearchRow>(
-      `SELECT id, document_id, knowledge_base_id, ordinal, text,
-              (1 - (embedding <=> $3::vector))::float8 AS score
-       FROM document_chunks
-       WHERE tenant_id = $1 AND knowledge_base_id = ANY($2::uuid[])
-       ORDER BY embedding <=> $3::vector, id
+      `SELECT c.id, c.document_id, c.knowledge_base_id, c.ordinal, c.text, d.filename,
+              (1 - (c.embedding <=> $3::vector))::float8 AS score
+       FROM document_chunks c
+       JOIN documents d ON d.id = c.document_id AND d.tenant_id = c.tenant_id
+       WHERE c.tenant_id = $1 AND c.knowledge_base_id = ANY($2::uuid[])
+       ORDER BY c.embedding <=> $3::vector, c.id
        LIMIT $4`,
       [tenantId, knowledgeBaseIds, vector, limit],
     );
     return result.rows.map(row => ({
       id: row.id, documentId: row.document_id, knowledgeBaseId: row.knowledge_base_id,
-      ordinal: row.ordinal, text: row.text, score: row.score,
+      ordinal: row.ordinal, text: row.text, score: row.score, filename: row.filename ?? undefined,
     }));
   }
 

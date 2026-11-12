@@ -4,6 +4,8 @@ Observed while reading the code (not exhaustive). These are prototype-stage limi
 
 ## Functional
 
+> Status 2026-11-12: items 1-4 and the Azure header in item 10 are fixed (see CHANGELOG); the rest remain open.
+
 ### Retrieval wiring: current vs intended
 
 ```mermaid

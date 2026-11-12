@@ -15,6 +15,8 @@ export interface VectorSearchResult {
   ordinal: number;
   text: string;
   score: number;
+  /** Source document filename, when the store can resolve it. */
+  filename?: string;
 }
 
 export interface VectorStore {

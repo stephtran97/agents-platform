@@ -44,7 +44,7 @@ export async function sendMessage(conversationId: string, message: string): Prom
   const response = await fetch(`${apiBase}/v1/conversations/${conversationId}/messages`, {
     method: 'POST',
     headers,
-    body: JSON.stringify({ message, knowledgeBaseIds: ['default'] }),
+    body: JSON.stringify({ message }),
   });
   if (!response.ok) throw new Error('AGENT_UNAVAILABLE');
   return response.json();

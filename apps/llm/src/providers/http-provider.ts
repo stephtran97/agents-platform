@@ -12,7 +12,10 @@ export class OpenAiCompatibleProvider implements LlmProvider {
     try {
       const response = await fetch(`${this.options.baseUrl.replace(/\/$/, '')}${path}`, {
         method: 'POST',
-        headers: { authorization: `Bearer ${this.options.apiKey}`, 'content-type': 'application/json' },
+        headers: {
+          ...(this.options.provider === 'azure-openai' ? { 'api-key': this.options.apiKey } : { authorization: `Bearer ${this.options.apiKey}` }),
+          'content-type': 'application/json',
+        },
         body: JSON.stringify(body),
         signal: controller.signal,
       });

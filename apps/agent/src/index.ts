@@ -1,9 +1,8 @@
-import Fastify from 'fastify';
 import { LlmClient } from '@agents-platform/clients';
 import { PgVectorStore } from '@agents-platform/domain';
 import { Pool } from 'pg';
 import { VectorRetriever } from './retrieval/vector-retriever.js';
-import { registerAgentRoutes } from './http/routes.js';
+import { buildAgentServer } from './http/server.js';
 import { createAgentRuntime } from './runtime-registry.js';
 
 const llm = new LlmClient(process.env.LLM_URL ?? 'http://localhost:4102');
@@ -19,11 +18,10 @@ const runtime = createAgentRuntime(process.env.AGENT_RUNTIME ?? 'basic-rag', {
     },
   },
 });
-const app = Fastify({ logger: true });
-app.addHook('onClose', async () => { await pool?.end(); });
 
 async function main(): Promise<void> {
-  await registerAgentRoutes(app, runtime);
+  const app = await buildAgentServer(runtime);
+  app.addHook('onClose', async () => { await pool?.end(); });
   await app.listen({ port: Number(process.env.PORT ?? 4101), host: '0.0.0.0' });
 }
 
