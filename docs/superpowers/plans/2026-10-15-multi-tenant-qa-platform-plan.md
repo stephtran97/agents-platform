@@ -524,7 +524,7 @@
 - Modify: `README.md` if verification discovers setup gaps.
 - Create: `docs/superpowers/verification/2026-10-15-multi-tenant-qa-platform-verification.md`
 
-- [ ] **Step 1: Run the clean-start verification**
+- [x] **Step 1: Run the clean-start verification**
 
   Remove only the project’s named Docker volumes after confirming their exact names, restart from a clean checkout state, and run the documented setup and test commands.
 

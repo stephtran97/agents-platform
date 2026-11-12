@@ -12,6 +12,10 @@ Recorded 2026-11-12 against the Docker Compose stack (`docker compose up -d --bu
 | `pnpm exec vitest run tests/evaluation tests/integration` | PASS — evaluation (2) and document-to-answer (2) |
 | `pnpm test:e2e` (Playwright) | PASS — 8 tests: 6 stubbed UI tests, 1 real-stack upload→ready→answer→citation test, 1 unsupported-file test |
 
+## Clean start
+
+On 2026-11-13, after confirmation, `docker compose down` and removal of only `agents-platform_postgres_data` and `agents-platform_minio_data` (names confirmed with `docker volume ls`), then `docker compose up -d --build --wait` brought every service healthy from empty volumes. Typecheck, build, `pnpm test:integration` (75/75) and `pnpm test:e2e` (8/8) all passed afterwards.
+
 ## Replaceability
 
 `createAgentRuntime(name, deps)` selects the runtime from `AGENT_RUNTIME`; an unknown name fails fast with `AGENT_RUNTIME_UNAVAILABLE` (`apps/agent/src/runtime-registry.test.ts`). `createLlmProvider` selects the provider from `LLM_PROVIDER` and rejects unknown names or missing credentials (`apps/llm/src/provider-registry.test.ts`). Both are configuration changes in `.env`/Compose, not source edits. Only the `mock` provider and `basic-rag` runtime were exercised end to end; the OpenAI/Azure adapter was verified only with a faked `fetch` (auth header, error and timeout mapping), never against a real endpoint.
@@ -39,7 +43,6 @@ Recorded 2026-11-12 against the Docker Compose stack (`docker compose up -d --bu
 
 ## Known limitations
 
-- **Not performed: clean-start volume removal** (plan Task 10 Step 1). It deletes the local `postgres_data` and `minio_data` volumes, so it needs explicit confirmation first.
 - A local Windows PostgreSQL listens on port 5432 on the verification machine and shadows the container. Set `POSTGRES_PORT` (for example `5433`) and point `DATABASE_URL` at it for host-side integration tests.
 - The Postgres job-claim test and the end-to-end test share a database with the live worker, which also claims jobs. Run integration tests serially (`pnpm test:integration`) rather than in the parallel `pnpm test`, or stop the worker.
 - Plan deviation: the API keeps its handlers in `apps/api/src/index.ts` and `store.ts` rather than the planned `auth/`, `services/` and `http/routes/` files. Behavior and tenant-isolation tests are covered.
