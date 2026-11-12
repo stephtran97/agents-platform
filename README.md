@@ -64,4 +64,16 @@ pnpm --filter @agents-platform/web build
 
 The PostgreSQL and MinIO integration tests require Docker Desktop and running services. They are intentionally not included in the non-integration verification command above.
 
+### Integration, evaluation, and end-to-end tests
+
+`tests/evaluation/basic-rag.evaluation.test.ts` runs `basic-rag` over the mock provider against `tests/evaluation/fixtures/handbook.txt` and needs no infrastructure. `tests/integration/document-to-answer.test.ts` drives the full upload → ingestion → question → citation flow over HTTP against the running Compose stack (`API_URL`, default `http://localhost:4100`, with `LLM_PROVIDER=mock`); it skips its tests when the API is unreachable.
+
+```powershell
+docker compose up -d --build --wait
+pnpm exec vitest run tests/evaluation tests/integration
+pnpm test:e2e   # Playwright, API stubbed
+```
+
+In Compose only the web (`5173`) and API (`4100`) ports are published; the agent and LLM services are reachable only on the internal network. To switch behaviour, set `AGENT_RUNTIME` / `LLM_PROVIDER` in `.env` and recreate the containers.
+
 Never commit `.env`, credentials, or provider API keys. Use `.env.example` as the sanitized configuration reference.

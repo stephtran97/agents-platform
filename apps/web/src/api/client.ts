@@ -35,7 +35,7 @@ export async function uploadDocument(file: File): Promise<DocumentSummary> {
 }
 
 export async function createConversation(): Promise<{ id: string }> {
-  const response = await fetch(`${apiBase}/v1/conversations`, { method: 'POST', headers });
+  const response = await fetch(`${apiBase}/v1/conversations`, { method: 'POST', headers, body: '{}' });
   if (!response.ok) throw new Error('CONVERSATION_UNAVAILABLE');
   return response.json();
 }

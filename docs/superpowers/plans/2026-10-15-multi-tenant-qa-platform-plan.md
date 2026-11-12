@@ -482,39 +482,39 @@
 - The end-to-end test uses only the mock provider and asserts the full upload → ingestion → question → citation flow.
 - The evaluation fixture and expected answer/citation assertions are stable and provider-independent.
 
-- [ ] **Step 1: Write the end-to-end test**
+- [x] **Step 1: Write the end-to-end test**
 
   Start with a fixture containing a fact and a distractor. Upload it, wait for `READY`, ask a question, and assert the answer contains the grounded fact, includes the source document/chunk citation, and has a trace ID.
 
-- [ ] **Step 2: Run the end-to-end test to verify it fails**
+- [x] **Step 2: Run the end-to-end test to verify it fails**
 
   Run: `docker compose up -d; pnpm test:integration -- tests/integration/document-to-answer.test.ts`
 
   Expected: FAIL until all services are wired and started.
 
-- [ ] **Step 3: Wire Compose services and startup ordering**
+- [x] **Step 3: Wire Compose services and startup ordering**
 
   Add build targets, internal URLs, health checks, database initialization, MinIO bucket creation, and worker startup. Do not expose agent or LLM ports as public application endpoints.
 
-- [ ] **Step 4: Implement the end-to-end test harness**
+- [x] **Step 4: Implement the end-to-end test harness**
 
   Use the API over HTTP, poll document status with a bounded timeout, and clean the test tenant/database rows between runs.
 
-- [ ] **Step 5: Add the evaluation fixture and test**
+- [x] **Step 5: Add the evaluation fixture and test**
 
   Assert the same fixture can be run against `basic-rag` and the mock provider, with citations mapped to the expected chunk rather than merely checking non-empty text.
 
-- [ ] **Step 6: Document local setup and experiments**
+- [x] **Step 6: Document local setup and experiments**
 
   README must include prerequisites, `cp .env.example .env`, `docker compose up`, test commands, service URLs, and how to switch `AGENT_RUNTIME`/`LLM_PROVIDER`.
 
-- [ ] **Step 7: Run the complete verification suite**
+- [x] **Step 7: Run the complete verification suite**
 
   Run: `docker compose up -d; pnpm typecheck; pnpm test; pnpm test:integration; pnpm --filter @agents-platform/web build`
 
   Expected: all unit, contract, integration, evaluation, and end-to-end tests pass; web build completes.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
   `git add docker-compose.yml infra tests scripts README.md && git commit -m "test: wire prototype end to end"`
 
