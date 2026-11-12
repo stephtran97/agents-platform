@@ -1,11 +1,17 @@
 import Fastify from 'fastify';
 import { LlmClient } from '@agents-platform/clients';
+import { PgVectorStore } from '@agents-platform/domain';
+import { Pool } from 'pg';
+import { VectorRetriever } from './retrieval/vector-retriever.js';
 import { registerAgentRoutes } from './http/routes.js';
 import { createAgentRuntime } from './runtime-registry.js';
 
 const llm = new LlmClient(process.env.LLM_URL ?? 'http://localhost:4102');
+// Without a database the agent has nothing to retrieve from, so it falls back to an empty store.
+const pool = process.env.DATABASE_URL ? new Pool({ connectionString: process.env.DATABASE_URL }) : undefined;
+const retriever = pool ? new VectorRetriever(new PgVectorStore(pool), llm) : undefined;
 const runtime = createAgentRuntime(process.env.AGENT_RUNTIME ?? 'basic-rag', {
-  vectorStore: { search: async () => [] },
+  vectorStore: retriever ?? { search: async () => [] },
   llm: {
     complete: async (input) => {
       const result = await llm.complete(input);
@@ -14,6 +20,7 @@ const runtime = createAgentRuntime(process.env.AGENT_RUNTIME ?? 'basic-rag', {
   },
 });
 const app = Fastify({ logger: true });
+app.addHook('onClose', async () => { await pool?.end(); });
 
 async function main(): Promise<void> {
   await registerAgentRoutes(app, runtime);

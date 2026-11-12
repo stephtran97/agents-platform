@@ -89,7 +89,9 @@ services:
     environment:
       LLM_URL: http://llm:4102
       AGENT_RUNTIME: ${AGENT_RUNTIME:-basic-rag}
+      DATABASE_URL: postgres://${POSTGRES_USER:-agents}:${POSTGRES_PASSWORD:-agents}@postgres:5432/${POSTGRES_DB:-agents}
     depends_on:
+      postgres: { condition: service_healthy }
       llm: { condition: service_healthy }
     ports:
       - "4101:4101"

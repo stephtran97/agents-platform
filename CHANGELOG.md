@@ -5,6 +5,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 ## [Unreleased]
 
 ### Fixed
+- The agent service now retrieves from pgvector (it used an empty stub), and the API searches the tenant's default knowledge base when a request names none, so questions are answered from ingested documents.
 - Document upload and conversations no longer fail against PostgreSQL: documents are filed under a per-tenant default knowledge base UUID (created on demand) instead of the invalid `'default'`, and non-UUID tenant keys such as `local` are mapped to stable tenant UUIDs.
 
 ### Changed
