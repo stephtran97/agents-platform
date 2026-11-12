@@ -46,6 +46,8 @@ Use Vitest. Add regression tests for new behavior and bug fixes. Test names shou
 
 Every tenant-owned feature should include isolation coverage. Service-boundary tests should use injected fakes rather than network calls. Integration tests may use Docker-backed PostgreSQL/MinIO, but must be clearly identified and should not make unit tests depend on external services.
 
+Always run `pnpm build` before running tests. Tests against the Docker stack (integration and `pnpm test:e2e`) exercise the built images, so also rebuild them with `docker compose up -d --build` first.
+
 Before claiming a change is complete, run `pnpm typecheck`, the relevant focused tests, and `pnpm build` when build behavior is affected. Record infrastructure limitations explicitly.
 
 ## Changelog
