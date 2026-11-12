@@ -10,7 +10,7 @@ describe('agent HTTP routes', () => {
       answer: 'The answer',
       citations: [],
       toolCalls: [],
-      traceId: 'trace-123',
+      traceId: 'trace-123'
     };
     await registerAgentRoutes(app, { answer: async () => response });
 
@@ -22,8 +22,8 @@ describe('agent HTTP routes', () => {
         knowledgeBaseIds: ['kb-1'],
         conversationId: 'conversation-1',
         messages: [{ role: 'user', content: 'Hello' }],
-        question: 'What is this?',
-      },
+        question: 'What is this?'
+      }
     });
 
     expect(result.statusCode).toBe(200);
@@ -32,7 +32,9 @@ describe('agent HTTP routes', () => {
 
   it('rejects malformed requests', async () => {
     const app = Fastify();
-    await registerAgentRoutes(app, { answer: async () => ({ answer: '', citations: [], toolCalls: [], traceId: 'trace-123' }) });
+    await registerAgentRoutes(app, {
+      answer: async () => ({ answer: '', citations: [], toolCalls: [], traceId: 'trace-123' })
+    });
     const result = await app.inject({ method: 'POST', url: '/v1/answer', payload: {} });
     expect(result.statusCode).toBe(400);
   });

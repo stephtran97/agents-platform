@@ -26,8 +26,13 @@ function chunkId(documentId: string, ordinal: number): string {
 export function chunkText(text: string, options: ChunkOptions): DocumentChunkDraft[] {
   const { documentId, maxCharacters, overlapCharacters } = options;
   if (!documentId || !text.trim()) throw new Error('Document ID and nonempty text are required');
-  if (!Number.isSafeInteger(maxCharacters) || maxCharacters < 1 ||
-      !Number.isSafeInteger(overlapCharacters) || overlapCharacters < 0 || overlapCharacters >= maxCharacters) {
+  if (
+    !Number.isSafeInteger(maxCharacters) ||
+    maxCharacters < 1 ||
+    !Number.isSafeInteger(overlapCharacters) ||
+    overlapCharacters < 0 ||
+    overlapCharacters >= maxCharacters
+  ) {
     throw new Error('Chunk size must be positive and overlap must be smaller than chunk size');
   }
 
@@ -38,8 +43,14 @@ export function chunkText(text: string, options: ChunkOptions): DocumentChunkDra
     if (end < text.length && /[\uD800-\uDBFF]/u.test(text[end - 1]!)) end--;
     if (end <= start) throw new Error('Chunk size cannot contain a Unicode character');
     const ordinal = chunks.length;
-    chunks.push({ id: chunkId(documentId, ordinal), documentId, ordinal,
-      text: text.slice(start, end), startOffset: start, endOffset: end });
+    chunks.push({
+      id: chunkId(documentId, ordinal),
+      documentId,
+      ordinal,
+      text: text.slice(start, end),
+      startOffset: start,
+      endOffset: end
+    });
     if (end === text.length) break;
     start = Math.max(start + 1, end - overlapCharacters);
     if (/[\uDC00-\uDFFF]/u.test(text[start]!)) start--;

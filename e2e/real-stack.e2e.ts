@@ -8,21 +8,30 @@ const apiUrl = process.env.API_URL ?? 'http://localhost:4100';
 const handbook = readFileSync(`${process.cwd()}/tests/evaluation/fixtures/handbook.txt`);
 
 test.beforeEach(async ({ request }) => {
-  const healthy = await request.get(`${apiUrl}/health`).then((r) => r.ok(), () => false);
+  const healthy = await request.get(`${apiUrl}/health`).then(
+    (r) => r.ok(),
+    () => false
+  );
   test.skip(!healthy, `API not reachable at ${apiUrl}`);
 });
 
 test('uploads a document, waits for ingestion, and answers with a citation', async ({ page }) => {
   // The web client hardcodes the dev tenant; give each run its own so results are deterministic.
   const tenant = `e2e-${randomUUID()}`;
-  await page.route('**/v1/**', (route) => route.continue({ headers: { ...route.request().headers(), 'x-tenant-id': tenant } }));
+  await page.route('**/v1/**', (route) =>
+    route.continue({ headers: { ...route.request().headers(), 'x-tenant-id': tenant } })
+  );
 
   await page.goto('/');
   await expect(page.getByRole('button', { name: 'Ask question' })).toBeDisabled();
-  await page.getByLabel('Your question').fill('How many vacation days do full-time employees accrue per year?');
+  await page
+    .getByLabel('Your question')
+    .fill('How many vacation days do full-time employees accrue per year?');
   await expect(page.getByText('Chat unlocks once at least one document is ready.')).toBeVisible();
 
-  await page.getByLabel('Upload a document').setInputFiles({ name: 'handbook.txt', mimeType: 'text/plain', buffer: handbook });
+  await page
+    .getByLabel('Upload a document')
+    .setInputFiles({ name: 'handbook.txt', mimeType: 'text/plain', buffer: handbook });
   await expect(page.getByText(/handbook\.txt uploaded/)).toBeVisible();
 
   const documents = page.getByRole('list', { name: 'Documents' });
@@ -35,14 +44,18 @@ test('uploads a document, waits for ingestion, and answers with a citation', asy
   await expect(page.locator('.answer li').first()).toContainText('handbook.txt');
 });
 
-test('shows a failure state for an unsupported file type without calling the API', async ({ page }) => {
+test('shows a failure state for an unsupported file type without calling the API', async ({
+  page
+}) => {
   let uploads = 0;
   await page.route('**/v1/documents', (route) => {
     if (route.request().method() === 'POST') uploads += 1;
     return route.continue();
   });
   await page.goto('/');
-  await page.getByLabel('Upload a document').setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: Buffer.from('x') });
+  await page
+    .getByLabel('Upload a document')
+    .setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: Buffer.from('x') });
   await expect(page.getByRole('alert')).toContainText('Unsupported file type');
   expect(uploads).toBe(0);
 });

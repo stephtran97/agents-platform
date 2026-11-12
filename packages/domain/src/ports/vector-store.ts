@@ -20,7 +20,16 @@ export interface VectorSearchResult {
 }
 
 export interface VectorStore {
-  upsertChunks(tenantId: string, knowledgeBaseId: string, chunks: readonly DocumentChunkInput[]): Promise<void>;
-  search(tenantId: string, knowledgeBaseIds: readonly string[], embedding: readonly number[], limit: number): Promise<VectorSearchResult[]>;
+  upsertChunks(
+    tenantId: string,
+    knowledgeBaseId: string,
+    chunks: readonly DocumentChunkInput[]
+  ): Promise<void>;
+  search(
+    tenantId: string,
+    knowledgeBaseIds: readonly string[],
+    embedding: readonly number[],
+    limit: number
+  ): Promise<VectorSearchResult[]>;
   deleteDocument(tenantId: string, knowledgeBaseId: string, documentId: string): Promise<void>;
 }

@@ -2,7 +2,11 @@
   "name": "@agents-platform/worker",
   "version": "0.1.0",
   "private": true,
-  "scripts": { "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist", "test": "vitest run", "typecheck": "tsc --noEmit -p ../../tsconfig.base.json" },
+  "scripts": {
+    "build": "tsc --noEmit false -p ../../tsconfig.base.json --outDir dist",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p ../../tsconfig.base.json"
+  },
   "dependencies": {
     "@agents-platform/clients": "workspace:*",
     "@agents-platform/domain": "workspace:*",

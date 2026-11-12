@@ -16,7 +16,7 @@ describe('workspace manifests', () => {
     expect(scripts).toMatchObject({
       build: expect.any(String),
       test: expect.any(String),
-      typecheck: expect.any(String),
+      typecheck: expect.any(String)
     });
   });
 
@@ -31,11 +31,13 @@ describe('workspace manifests', () => {
       'packages/domain',
       'packages/clients',
       'packages/config',
-      'packages/observability',
+      'packages/observability'
     ];
 
     for (const directory of directories) {
-      expect(readManifest(`${directory}/package.json`).scripts?.typecheck).toEqual(expect.any(String));
+      expect(readManifest(`${directory}/package.json`).scripts?.typecheck).toEqual(
+        expect.any(String)
+      );
     }
   });
 });

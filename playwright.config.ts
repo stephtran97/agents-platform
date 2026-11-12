@@ -20,6 +20,6 @@ export default defineConfig({
         command: `pnpm --filter @agents-platform/web exec vite --port ${port} --strictPort`,
         url: baseURL,
         reuseExistingServer: false,
-        timeout: 60_000,
-      },
+        timeout: 60_000
+      }
 });

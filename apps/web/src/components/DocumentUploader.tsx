@@ -18,7 +18,10 @@ export function DocumentUploader({ onUpload }: { onUpload: (file: File) => Promi
     if (!file) return;
     const lower = file.name.toLowerCase();
     if (!supportedExtensions.some((extension) => lower.endsWith(extension))) {
-      setState({ kind: 'error', message: `Unsupported file type. Use ${supportedExtensions.join(', ')}.` });
+      setState({
+        kind: 'error',
+        message: `Unsupported file type. Use ${supportedExtensions.join(', ')}.`
+      });
     } else if (file.size > maxBytes) {
       setState({ kind: 'error', message: 'File is too large (5 MB maximum).' });
     } else {
@@ -44,7 +47,9 @@ export function DocumentUploader({ onUpload }: { onUpload: (file: File) => Promi
         onChange={handleChange}
       />
       {state.kind === 'uploading' && <p role="status">Uploading {state.name}…</p>}
-      {state.kind === 'done' && <p role="status">{state.name} uploaded. Processing will start shortly.</p>}
+      {state.kind === 'done' && (
+        <p role="status">{state.name} uploaded. Processing will start shortly.</p>
+      )}
       {state.kind === 'error' && (
         <p className="error" role="alert">
           {state.message}

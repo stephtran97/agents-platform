@@ -7,7 +7,9 @@ export function CitationList({ citations }: { citations: AgentResponse['citation
       <h2>Sources</h2>
       <ul>
         {citations.map((citation) => (
-          <li key={`${citation.documentId}:${citation.chunkId}`}>{`${citation.filename} · ${citation.chunkId}`}</li>
+          <li
+            key={`${citation.documentId}:${citation.chunkId}`}
+          >{`${citation.filename} · ${citation.chunkId}`}</li>
         ))}
       </ul>
     </>

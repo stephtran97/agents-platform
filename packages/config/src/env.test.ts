@@ -6,7 +6,7 @@ const requiredEnv = {
   S3_ENDPOINT: 'http://localhost:9000',
   S3_BUCKET: 'agents-documents',
   S3_ACCESS_KEY: 'minioadmin',
-  S3_SECRET_KEY: 'minioadmin',
+  S3_SECRET_KEY: 'minioadmin'
 };
 
 describe('loadConfig', () => {
@@ -14,7 +14,7 @@ describe('loadConfig', () => {
     expect(loadConfig(requiredEnv)).toMatchObject({
       tenantId: 'local-tenant',
       agentRuntime: 'basic-rag',
-      llmProvider: 'mock',
+      llmProvider: 'mock'
     });
   });
 
@@ -27,7 +27,9 @@ describe('loadConfig', () => {
   });
 
   it('accepts a real provider with a secret', () => {
-    expect(loadConfig({ ...requiredEnv, LLM_PROVIDER: 'openai', OPENAI_API_KEY: 'key' }).llmProvider).toBe('openai');
+    expect(
+      loadConfig({ ...requiredEnv, LLM_PROVIDER: 'openai', OPENAI_API_KEY: 'key' }).llmProvider
+    ).toBe('openai');
   });
 
   it('requires database and object storage settings', () => {
@@ -39,6 +41,8 @@ describe('loadConfig', () => {
   });
 
   it('rejects whitespace-only provider secrets', () => {
-    expect(() => loadConfig({ ...requiredEnv, LLM_PROVIDER: 'openai', OPENAI_API_KEY: '  ' })).toThrow(/secret/i);
+    expect(() =>
+      loadConfig({ ...requiredEnv, LLM_PROVIDER: 'openai', OPENAI_API_KEY: '  ' })
+    ).toThrow(/secret/i);
   });
 });

@@ -2,7 +2,10 @@ import type { Conversation, ConversationMessage } from '../entities.js';
 import type { TenantContext } from '../tenant-context.js';
 
 export type NewConversation = Pick<Conversation, 'id'> & Pick<Conversation, 'title'>;
-export type NewConversationMessage = Pick<ConversationMessage, 'id' | 'conversationId' | 'message'> &
+export type NewConversationMessage = Pick<
+  ConversationMessage,
+  'id' | 'conversationId' | 'message'
+> &
   Partial<Pick<ConversationMessage, 'citations'>>;
 
 export interface ConversationRepository {

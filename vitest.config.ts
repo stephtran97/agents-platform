@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     projects: [
       { test: { name: 'node', exclude: [...configDefaults.exclude, 'apps/web/**', 'e2e/**'] } },
-      'apps/web',
-    ],
-  },
+      'apps/web'
+    ]
+  }
 });

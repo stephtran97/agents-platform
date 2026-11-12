@@ -1,4 +1,9 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client
+} from '@aws-sdk/client-s3';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MinioObjectStore } from './minio-object-store.js';
 
@@ -22,7 +27,12 @@ it('stores, retrieves, and deletes bytes under a tenant/document-scoped key', as
     }
     throw new Error('Unexpected command');
   });
-  const store = new MinioObjectStore({ endpoint: 'http://localhost:9000', bucket: 'test', accessKey: 'key', secretKey: 'secret' });
+  const store = new MinioObjectStore({
+    endpoint: 'http://localhost:9000',
+    bucket: 'test',
+    accessKey: 'key',
+    secretKey: 'secret'
+  });
 
   const key = await store.put('tenant', 'document', Buffer.from('hello'), 'text/plain');
   expect(key).toMatch(/^tenant\/document\/[^/]+$/);

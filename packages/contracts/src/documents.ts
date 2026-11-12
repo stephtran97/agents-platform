@@ -11,7 +11,7 @@ export const uploadDocumentRequestSchema = z.object({
   tenantId: tenantIdSchema,
   knowledgeBaseId: z.string().trim().min(1),
   metadata: uploadMetadataSchema,
-  traceId: traceIdSchema.optional(),
+  traceId: traceIdSchema.optional()
 });
 export type UploadDocumentRequest = z.infer<typeof uploadDocumentRequestSchema>;
 
@@ -23,7 +23,7 @@ export const documentSchema = z.object({
   contentType: z.string().min(1),
   sizeBytes: z.number().int().nonnegative(),
   status: documentStatusSchema,
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime()
 });
 export type DocumentDto = z.infer<typeof documentSchema>;
 
@@ -33,6 +33,6 @@ export const ingestionJobSchema = z.object({
   documentId: z.string().min(1),
   status: ingestionJobStatusSchema,
   attempts: z.number().int().nonnegative(),
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime()
 });
 export type IngestionJobDto = z.infer<typeof ingestionJobSchema>;

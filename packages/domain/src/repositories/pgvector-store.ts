@@ -13,7 +13,10 @@ interface SearchRow extends QueryResultRow {
 }
 
 function vectorLiteral(embedding: readonly number[]): string {
-  if (embedding.length !== EMBEDDING_DIMENSION || embedding.some(value => !Number.isFinite(value))) {
+  if (
+    embedding.length !== EMBEDDING_DIMENSION ||
+    embedding.some((value) => !Number.isFinite(value))
+  ) {
     throw new Error(`Embedding must contain ${EMBEDDING_DIMENSION} finite values`);
   }
   return `[${embedding.join(',')}]`;
@@ -22,7 +25,11 @@ function vectorLiteral(embedding: readonly number[]): string {
 export class PgVectorStore implements VectorStore {
   constructor(private readonly pool: Pool) {}
 
-  async upsertChunks(tenantId: string, knowledgeBaseId: string, chunks: readonly DocumentChunkInput[]): Promise<void> {
+  async upsertChunks(
+    tenantId: string,
+    knowledgeBaseId: string,
+    chunks: readonly DocumentChunkInput[]
+  ): Promise<void> {
     for (const chunk of chunks) {
       const result = await this.pool.query<{ id: string }>(
         `INSERT INTO document_chunks (id, tenant_id, knowledge_base_id, document_id, ordinal, text, embedding)
@@ -36,13 +43,27 @@ export class PgVectorStore implements VectorStore {
            AND document_chunks.knowledge_base_id = EXCLUDED.knowledge_base_id
            AND document_chunks.document_id = EXCLUDED.document_id
          RETURNING id`,
-        [chunk.id, tenantId, knowledgeBaseId, chunk.documentId, chunk.ordinal, chunk.text, vectorLiteral(chunk.embedding)],
+        [
+          chunk.id,
+          tenantId,
+          knowledgeBaseId,
+          chunk.documentId,
+          chunk.ordinal,
+          chunk.text,
+          vectorLiteral(chunk.embedding)
+        ]
       );
-      if (result.rows.length === 0) throw new Error('Chunk could not be written in tenant and knowledge base');
+      if (result.rows.length === 0)
+        throw new Error('Chunk could not be written in tenant and knowledge base');
     }
   }
 
-  async search(tenantId: string, knowledgeBaseIds: readonly string[], embedding: readonly number[], limit: number): Promise<VectorSearchResult[]> {
+  async search(
+    tenantId: string,
+    knowledgeBaseIds: readonly string[],
+    embedding: readonly number[],
+    limit: number
+  ): Promise<VectorSearchResult[]> {
     const vector = vectorLiteral(embedding);
     if (knowledgeBaseIds.length === 0 || limit <= 0) return [];
     const result = await this.pool.query<SearchRow>(
@@ -53,18 +74,27 @@ export class PgVectorStore implements VectorStore {
        WHERE c.tenant_id = $1 AND c.knowledge_base_id = ANY($2::uuid[])
        ORDER BY c.embedding <=> $3::vector, c.id
        LIMIT $4`,
-      [tenantId, knowledgeBaseIds, vector, limit],
+      [tenantId, knowledgeBaseIds, vector, limit]
     );
-    return result.rows.map(row => ({
-      id: row.id, documentId: row.document_id, knowledgeBaseId: row.knowledge_base_id,
-      ordinal: row.ordinal, text: row.text, score: row.score, filename: row.filename ?? undefined,
+    return result.rows.map((row) => ({
+      id: row.id,
+      documentId: row.document_id,
+      knowledgeBaseId: row.knowledge_base_id,
+      ordinal: row.ordinal,
+      text: row.text,
+      score: row.score,
+      filename: row.filename ?? undefined
     }));
   }
 
-  async deleteDocument(tenantId: string, knowledgeBaseId: string, documentId: string): Promise<void> {
+  async deleteDocument(
+    tenantId: string,
+    knowledgeBaseId: string,
+    documentId: string
+  ): Promise<void> {
     await this.pool.query(
       'DELETE FROM document_chunks WHERE tenant_id = $1 AND knowledge_base_id = $2 AND document_id = $3',
-      [tenantId, knowledgeBaseId, documentId],
+      [tenantId, knowledgeBaseId, documentId]
     );
   }
 }

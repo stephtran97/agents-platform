@@ -3,7 +3,9 @@ import { PlainTextExtractor } from './plain-text-extractor.js';
 
 describe('PlainTextExtractor', () => {
   it('handles plain text and markdown uploads', () => {
-    expect(new PlainTextExtractor().supportedMimeTypes).toEqual(expect.arrayContaining(['text/plain', 'text/markdown']));
+    expect(new PlainTextExtractor().supportedMimeTypes).toEqual(
+      expect.arrayContaining(['text/plain', 'text/markdown'])
+    );
   });
 
   it('decodes UTF-8 and strips a byte order mark', async () => {

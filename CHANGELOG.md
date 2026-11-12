@@ -4,6 +4,10 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 
 ## [Unreleased]
 
+### Added
+- Shared VS Code settings (`.vscode`) that format with Prettier and fix ESLint issues on save.
+- ESLint (typescript-eslint, react-hooks) and Prettier with `pnpm lint`, `lint:fix`, `format` and `format:check` scripts; a Husky pre-commit hook runs lint-staged on staged files.
+
 ### Fixed
 - Markdown (`text/markdown`) uploads are now ingested instead of failing as unsupported.
 - Chat now works against the real API: the web client no longer sends the non-UUID `default` knowledge base id, and the API maps `default` to the tenant default knowledge base.
@@ -15,6 +19,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 - Document upload and conversations no longer fail against PostgreSQL: documents are filed under a per-tenant default knowledge base UUID (created on demand) instead of the invalid `'default'`, and non-UUID tenant keys such as `local` are mapped to stable tenant UUIDs.
 
 ### Changed
+- Reformatted the codebase with Prettier and removed unused imports flagged by ESLint.
 - Compose publishes Postgres on `${POSTGRES_PORT:-5432}` so it can avoid a local PostgreSQL on the same port.
 - Compose no longer publishes the agent and LLM ports; only web and API are public.
 - Compose now uses `bitnamilegacy/minio` for object storage because `minio/minio` is no longer published on Docker Hub.

@@ -18,7 +18,7 @@ const sampleQuestions: Record<string, string> = {
   'company-handbook.md': 'How many vacation days do full-time employees get?',
   'product-faq.md': 'What is the refund policy for annual subscriptions?',
   'security-policy.txt': 'How quickly must a security incident be reported?',
-  'onboarding-guide.txt': 'On which days do we release?',
+  'onboarding-guide.txt': 'On which days do we release?'
 };
 const contentTypes: Record<string, string> = { '.md': 'text/markdown', '.txt': 'text/plain' };
 
@@ -34,11 +34,16 @@ const askQuestions = process.argv.includes('--ask');
 const dataDir = join(process.cwd(), 'scripts', 'mock-data');
 const headers = { 'content-type': 'application/json', 'x-tenant-id': tenant };
 
-interface DocumentSummary { id: string; filename: string; status: string }
+interface DocumentSummary {
+  id: string;
+  filename: string;
+  status: string;
+}
 
 async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`${apiUrl}${path}`, { ...init, headers });
-  if (!response.ok) throw new Error(`${init.method ?? 'GET'} ${path} failed with ${response.status}`);
+  if (!response.ok)
+    throw new Error(`${init.method ?? 'GET'} ${path} failed with ${response.status}`);
   return (await response.json()) as T;
 }
 
@@ -57,14 +62,23 @@ async function waitForReady(ids: string[]): Promise<Map<string, string>> {
 }
 
 async function main(): Promise<void> {
-  const health = await fetch(`${apiUrl}/health`).then((r) => r.ok, () => false);
+  const health = await fetch(`${apiUrl}/health`).then(
+    (r) => r.ok,
+    () => false
+  );
   if (!health) {
-    console.error(`API not reachable at ${apiUrl}. Start it with: docker compose up -d --build --wait`);
+    console.error(
+      `API not reachable at ${apiUrl}. Start it with: docker compose up -d --build --wait`
+    );
     process.exit(1);
   }
 
-  const existing = new Map((await api<DocumentSummary[]>('/v1/documents')).map((d) => [d.filename, d]));
-  const files = readdirSync(dataDir).filter((name) => extname(name) in contentTypes).sort();
+  const existing = new Map(
+    (await api<DocumentSummary[]>('/v1/documents')).map((d) => [d.filename, d])
+  );
+  const files = readdirSync(dataDir)
+    .filter((name) => extname(name) in contentTypes)
+    .sort();
   const pending: DocumentSummary[] = [];
 
   console.log(`Seeding tenant "${tenant}" at ${apiUrl}`);
@@ -81,8 +95,8 @@ async function main(): Promise<void> {
         filename: basename(name),
         contentType: contentTypes[extname(name)],
         sizeBytes: content.length,
-        contentBase64: content.toString('base64'),
-      }),
+        contentBase64: content.toString('base64')
+      })
     });
     console.log(`  upload  ${name}`);
     pending.push(document);
@@ -91,7 +105,8 @@ async function main(): Promise<void> {
   if (pending.length > 0) {
     console.log('Waiting for ingestion...');
     const statuses = await waitForReady(pending.map((d) => d.id));
-    for (const document of pending) console.log(`  ${(statuses.get(document.id) ?? 'timeout').padEnd(8)}${document.filename}`);
+    for (const document of pending)
+      console.log(`  ${(statuses.get(document.id) ?? 'timeout').padEnd(8)}${document.filename}`);
     if (pending.some((d) => statuses.get(d.id) !== 'ready')) {
       console.error('Some documents did not become ready.');
       process.exitCode = 1;
@@ -100,14 +115,22 @@ async function main(): Promise<void> {
 
   if (askQuestions) {
     console.log('Sample questions:');
-    const conversation = await api<{ id: string }>('/v1/conversations', { method: 'POST', body: '{}' });
+    const conversation = await api<{ id: string }>('/v1/conversations', {
+      method: 'POST',
+      body: '{}'
+    });
     for (const [file, question] of Object.entries(sampleQuestions)) {
-      const reply = await api<{ answer: string; citations: { filename: string }[] }>(`/v1/conversations/${conversation.id}/messages`, {
-        method: 'POST',
-        body: JSON.stringify({ message: question }),
-      });
+      const reply = await api<{ answer: string; citations: { filename: string }[] }>(
+        `/v1/conversations/${conversation.id}/messages`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ message: question })
+        }
+      );
       const sources = [...new Set(reply.citations.map((c) => c.filename))].join(', ') || 'none';
-      console.log(`  Q (${file}): ${question}\n    sources: ${sources}\n    ${reply.answer.split('\n')[0]!.slice(0, 160)}`);
+      console.log(
+        `  Q (${file}): ${question}\n    sources: ${sources}\n    ${reply.answer.split('\n')[0]!.slice(0, 160)}`
+      );
     }
   }
   console.log('Done. Open http://localhost:5173 to ask questions.');

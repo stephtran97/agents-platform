@@ -15,7 +15,8 @@ export function createPollingWorker({ jobs, processor }: PollingWorkerDependenci
 
   async function run(options: { signal: AbortSignal; pollIntervalMs?: number }): Promise<void> {
     const interval = options.pollIntervalMs ?? 1000;
-    if (!Number.isSafeInteger(interval) || interval < 1) throw new Error('Poll interval must be a positive integer');
+    if (!Number.isSafeInteger(interval) || interval < 1)
+      throw new Error('Poll interval must be a positive integer');
     while (!options.signal.aborted) {
       try {
         if (await runOnce()) continue;
@@ -24,9 +25,16 @@ export function createPollingWorker({ jobs, processor }: PollingWorkerDependenci
         console.error('Ingestion worker iteration failed', error);
       }
       if (options.signal.aborted) break;
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         const timer = setTimeout(resolve, interval);
-        options.signal.addEventListener('abort', () => { clearTimeout(timer); resolve(); }, { once: true });
+        options.signal.addEventListener(
+          'abort',
+          () => {
+            clearTimeout(timer);
+            resolve();
+          },
+          { once: true }
+        );
       });
     }
   }

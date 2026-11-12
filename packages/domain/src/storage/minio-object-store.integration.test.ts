@@ -7,11 +7,15 @@ const store = new MinioObjectStore({
   endpoint: process.env.S3_ENDPOINT ?? 'http://localhost:9000',
   bucket,
   accessKey: process.env.S3_ACCESS_KEY ?? 'minioadmin',
-  secretKey: process.env.S3_SECRET_KEY ?? 'minioadmin',
+  secretKey: process.env.S3_SECRET_KEY ?? 'minioadmin'
 });
 
-beforeAll(async () => { await store.createBucket(); });
-afterAll(async () => { await store.deleteBucket(); });
+beforeAll(async () => {
+  await store.createBucket();
+});
+afterAll(async () => {
+  await store.deleteBucket();
+});
 
 it('round trips bytes through a tenant/document-scoped opaque key', async () => {
   const tenantId = randomUUID();

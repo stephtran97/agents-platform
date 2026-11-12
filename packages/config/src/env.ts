@@ -13,7 +13,7 @@ const envSchema = z.object({
   S3_SECRET_KEY: z.string().trim().min(1),
   OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_API_KEY: z.string().optional(),
-  AZURE_OPENAI_ENDPOINT: z.string().url().optional(),
+  AZURE_OPENAI_ENDPOINT: z.string().url().optional()
 });
 
 export interface AppConfig {
@@ -33,11 +33,12 @@ export interface AppConfig {
 
 export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
   const parsed = envSchema.parse(env);
-  const providerSecret = parsed.LLM_PROVIDER === 'openai'
-    ? parsed.OPENAI_API_KEY
-    : parsed.LLM_PROVIDER === 'azure-openai'
-      ? parsed.AZURE_OPENAI_API_KEY
-      : undefined;
+  const providerSecret =
+    parsed.LLM_PROVIDER === 'openai'
+      ? parsed.OPENAI_API_KEY
+      : parsed.LLM_PROVIDER === 'azure-openai'
+        ? parsed.AZURE_OPENAI_API_KEY
+        : undefined;
 
   if (parsed.LLM_PROVIDER !== 'mock' && !providerSecret?.trim()) {
     throw new Error(`A non-empty secret is required for ${parsed.LLM_PROVIDER}`);
@@ -58,6 +59,8 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
     s3AccessKey: parsed.S3_ACCESS_KEY,
     s3SecretKey: parsed.S3_SECRET_KEY,
     ...(providerSecret ? { providerSecret } : {}),
-    ...(parsed.AZURE_OPENAI_ENDPOINT ? { azureOpenAiEndpoint: new URL(parsed.AZURE_OPENAI_ENDPOINT) } : {}),
+    ...(parsed.AZURE_OPENAI_ENDPOINT
+      ? { azureOpenAiEndpoint: new URL(parsed.AZURE_OPENAI_ENDPOINT) }
+      : {})
   };
 }

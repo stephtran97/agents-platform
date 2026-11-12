@@ -1,7 +1,18 @@
 import type { AgentRequest } from '@agents-platform/contracts';
 
-export type PromptSource = { chunkId: string; documentId: string; filename: string; content: string; startOffset?: number; endOffset?: number };
-export type PromptInput = { question: string; history: AgentRequest['messages']; sources: readonly PromptSource[] };
+export type PromptSource = {
+  chunkId: string;
+  documentId: string;
+  filename: string;
+  content: string;
+  startOffset?: number;
+  endOffset?: number;
+};
+export type PromptInput = {
+  question: string;
+  history: AgentRequest['messages'];
+  sources: readonly PromptSource[];
+};
 export type Prompt = { messages: AgentRequest['messages'] };
 
 const groundedInstruction =
@@ -12,12 +23,18 @@ const noContextInstruction =
 
 /** Builds a provider-independent grounded prompt. The final message always carries the question and labelled sources. */
 export function buildGroundedPrompt(input: PromptInput): Prompt {
-  const system = { role: 'system' as const, content: input.sources.length > 0 ? groundedInstruction : noContextInstruction };
+  const system = {
+    role: 'system' as const,
+    content: input.sources.length > 0 ? groundedInstruction : noContextInstruction
+  };
   const context =
     input.sources.length > 0
       ? input.sources
           .map((source, index) => {
-            const span = source.startOffset === undefined ? '' : ` offsets ${source.startOffset}-${source.endOffset ?? ''}`;
+            const span =
+              source.startOffset === undefined
+                ? ''
+                : ` offsets ${source.startOffset}-${source.endOffset ?? ''}`;
             return `[${source.chunkId}] (source ${index + 1}: ${source.filename}${span})\n${source.content}`;
           })
           .join('\n\n')
@@ -26,7 +43,7 @@ export function buildGroundedPrompt(input: PromptInput): Prompt {
     messages: [
       system,
       ...input.history.filter((message) => message.role !== 'system'),
-      { role: 'user', content: `${input.question}\nContext:\n${context}` },
-    ],
+      { role: 'user', content: `${input.question}\nContext:\n${context}` }
+    ]
   };
 }

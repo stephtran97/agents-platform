@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import {
-  CreateBucketCommand, DeleteBucketCommand, DeleteObjectCommand,
-  GetObjectCommand, PutObjectCommand, S3Client,
+  CreateBucketCommand,
+  DeleteBucketCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client
 } from '@aws-sdk/client-s3';
 import type { ObjectStore } from '../ports/object-store.js';
 
@@ -20,7 +24,7 @@ export class MinioObjectStore implements ObjectStore {
       endpoint: options.endpoint,
       region: 'us-east-1',
       forcePathStyle: true,
-      credentials: { accessKeyId: options.accessKey, secretAccessKey: options.secretKey },
+      credentials: { accessKeyId: options.accessKey, secretAccessKey: options.secretKey }
     });
   }
 
@@ -32,16 +36,28 @@ export class MinioObjectStore implements ObjectStore {
     await this.client.send(new DeleteBucketCommand({ Bucket: this.options.bucket }));
   }
 
-  async put(tenantId: string, documentId: string, contents: Buffer, contentType: string): Promise<string> {
+  async put(
+    tenantId: string,
+    documentId: string,
+    contents: Buffer,
+    contentType: string
+  ): Promise<string> {
     const key = `${encodeURIComponent(tenantId)}/${encodeURIComponent(documentId)}/${randomUUID()}`;
-    await this.client.send(new PutObjectCommand({
-      Bucket: this.options.bucket, Key: key, Body: contents, ContentType: contentType,
-    }));
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.options.bucket,
+        Key: key,
+        Body: contents,
+        ContentType: contentType
+      })
+    );
     return key;
   }
 
   async get(key: string): Promise<Buffer> {
-    const response = await this.client.send(new GetObjectCommand({ Bucket: this.options.bucket, Key: key }));
+    const response = await this.client.send(
+      new GetObjectCommand({ Bucket: this.options.bucket, Key: key })
+    );
     if (!response.Body) throw new Error('Object response has no body');
     return Buffer.from(await response.Body.transformToByteArray());
   }

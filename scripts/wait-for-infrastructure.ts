@@ -16,12 +16,14 @@ async function waitForInfrastructure(): Promise<void> {
     try {
       const output = execFileSync('docker', ['compose', 'ps', '--format', 'json'], {
         encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
+        stdio: ['ignore', 'pipe', 'ignore']
       });
       let services: ComposeService[];
       try {
         const parsed: unknown = JSON.parse(output);
-        services = Array.isArray(parsed) ? parsed as ComposeService[] : [parsed as ComposeService];
+        services = Array.isArray(parsed)
+          ? (parsed as ComposeService[])
+          : [parsed as ComposeService];
       } catch {
         services = output
           .split(/\r?\n/)
@@ -29,9 +31,7 @@ async function waitForInfrastructure(): Promise<void> {
           .map((line) => JSON.parse(line) as ComposeService);
       }
       const healthy = new Set(
-        services
-          .filter((service) => service.Health === 'healthy')
-          .map((service) => service.Service),
+        services.filter((service) => service.Health === 'healthy').map((service) => service.Service)
       );
 
       if ([...expected].every((service) => healthy.has(service))) {

@@ -15,7 +15,7 @@ describe('ChatPanel', () => {
     const ask = vi.fn().mockResolvedValue({
       ...base,
       answer: 'Refunds within 30 days.',
-      citations: [{ documentId: 'd1', chunkId: 'c7', filename: 'policy.md', score: 0.9 }],
+      citations: [{ documentId: 'd1', chunkId: 'c7', filename: 'policy.md', score: 0.9 }]
     });
     render(<ChatPanel ask={ask} />);
     await askQuestion();
@@ -26,7 +26,11 @@ describe('ChatPanel', () => {
   });
 
   it('renders a no-answer response without fake citations', async () => {
-    const ask = vi.fn().mockResolvedValue({ ...base, answer: 'I could not find relevant information.', citations: [] });
+    const ask = vi.fn().mockResolvedValue({
+      ...base,
+      answer: 'I could not find relevant information.',
+      citations: []
+    });
     render(<ChatPanel ask={ask} />);
     await askQuestion();
     expect(await screen.findByText('I could not find relevant information.')).toBeInTheDocument();

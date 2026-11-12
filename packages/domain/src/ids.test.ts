@@ -13,7 +13,9 @@ describe('deterministic ids', () => {
   it('maps tenant keys to UUIDs and passes UUID tenants through', () => {
     expect(toTenantUuid('local')).toMatch(uuid);
     expect(toTenantUuid('local')).not.toBe(toTenantUuid('local-2'));
-    expect(toTenantUuid('11111111-1111-1111-1111-111111111111')).toBe('11111111-1111-1111-1111-111111111111');
+    expect(toTenantUuid('11111111-1111-1111-1111-111111111111')).toBe(
+      '11111111-1111-1111-1111-111111111111'
+    );
   });
 
   it('gives each tenant its own default knowledge base UUID', () => {

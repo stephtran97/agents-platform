@@ -14,7 +14,9 @@ export function deterministicUuid(name: string): string {
 
 /** Tenant keys such as `local` are mapped to stable UUIDs; UUID tenant ids pass through lowercased. */
 export function toTenantUuid(tenantKey: string): string {
-  return uuidPattern.test(tenantKey) ? tenantKey.toLowerCase() : deterministicUuid(`tenant:${tenantKey}`);
+  return uuidPattern.test(tenantKey)
+    ? tenantKey.toLowerCase()
+    : deterministicUuid(`tenant:${tenantKey}`);
 }
 
 /** Id of the implicit default knowledge base each tenant owns. */

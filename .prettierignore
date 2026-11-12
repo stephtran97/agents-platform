@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+test-results
+playwright-report
+.worktrees
+.pnpm-store
+pnpm-lock.yaml
+*.png
+CHANGELOG.md
+docs
