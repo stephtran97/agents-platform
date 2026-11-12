@@ -438,31 +438,31 @@
 - `ChatPanel` renders messages, loading, API errors, and citations without knowing agent or LLM details.
 - `DocumentUploader` reports upload progress and ingestion status.
 
-- [ ] **Step 1: Write component tests**
+- [x] **Step 1: Write component tests**
 
   Assert upload controls accept supported files and show failure state, chat renders an answer and citations, and no-answer responses render without fake citations.
 
-- [ ] **Step 2: Run UI tests to verify they fail**
+- [x] **Step 2: Run UI tests to verify they fail**
 
   Run: `pnpm --filter @agents-platform/web test`
 
   Expected: FAIL because the Vite app and components do not exist.
 
-- [ ] **Step 3: Implement the typed API client and layout**
+- [x] **Step 3: Implement the typed API client and layout**
 
   Keep the UI single-tenant and focused on the vertical slice: document list/upload on one side and conversation/chat on the other.
 
-- [ ] **Step 4: Implement document and chat state**
+- [x] **Step 4: Implement document and chat state**
 
   Poll document status after upload, disable chat until at least one document is ready, and display citation metadata from the API response.
 
-- [ ] **Step 5: Run UI tests and build**
+- [x] **Step 5: Run UI tests and build**
 
   Run: `pnpm --filter @agents-platform/web test && pnpm --filter @agents-platform/web build`
 
   Expected: PASS and a production bundle is generated.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
   `git add apps/web && git commit -m "feat: add document Q&A web prototype"`
 

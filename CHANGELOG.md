@@ -13,6 +13,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 - Compose now uses `bitnamilegacy/minio` for object storage because `minio/minio` is no longer published on Docker Hub.
 
 ### Added
+- Web UI: document upload (txt, md, pdf, docx), a document list with live ingestion status, and a chat panel with citations; chat stays disabled until a document is ready. Component tests run under Vitest + Testing Library, wired into the root `pnpm test` via a Vitest projects config.
 - Playwright browser end-to-end tests for the Q&A web app (`pnpm test:e2e`), running against the Vite dev server with the API stubbed so no backend is required.
 - Docker Compose now runs every app (api, agent, llm, worker, web) in its own container from a shared multi-target `Dockerfile`, with a `minio-init` job that creates the document bucket.
 - Project documentation under `docs/` (architecture, services, API reference, data model, configuration, development guide, known gaps).
