@@ -5,6 +5,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 ## [Unreleased]
 
 ### Fixed
+- Markdown (`text/markdown`) uploads are now ingested instead of failing as unsupported.
 - Chat now works against the real API: the web client no longer sends the non-UUID `default` knowledge base id, and the API maps `default` to the tenant default knowledge base.
 - LLM gateway returns `400 INVALID_REQUEST` for malformed requests, enforces a gateway-level timeout (`504 MODEL_TIMEOUT`, `LLM_TIMEOUT_MS`), and Azure OpenAI now authenticates with the `api-key` header.
 - Conversations persist user and assistant messages and send prior turns to the agent; citations show the real document filename.
@@ -19,6 +20,7 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 - Compose now uses `bitnamilegacy/minio` for object storage because `minio/minio` is no longer published on Docker Hub.
 
 ### Added
+- `pnpm seed` loads sample documents (handbook, product FAQ, security policy, onboarding guide) into the running app through the API and can ask sample questions (`pnpm seed -- --ask`).
 - Agent prompt builder and retriever port, LLM/agent `server.ts` factories, API tenant-spoofing and history tests, a real-stack Playwright test (upload to cited answer), and a verification note under `docs/superpowers/verification/`.
 - Integration test for the full document-to-answer flow and a provider-independent `basic-rag` evaluation over a handbook fixture; Postgres init script enabling pgvector.
 - Web UI: document upload (txt, md, pdf, docx), a document list with live ingestion status, and a chat panel with citations; chat stays disabled until a document is ready. Component tests run under Vitest + Testing Library, wired into the root `pnpm test` via a Vitest projects config.

@@ -1,0 +1,16 @@
+New Engineer Onboarding Guide
+
+Week one
+On your first day you receive a laptop, accounts for email, chat and the code repository, and a buddy who answers questions during your first month. Complete the security training before you request production access. Your first pull request should be a small documentation fix so you learn the review process.
+
+Development environment
+Install Node.js 20 or newer and pnpm. Run pnpm install and then docker compose up to start the local database and object storage. The web app runs on port 5173 and the API on port 4100.
+
+Code review
+Every change needs one approving review. Reviews should be completed within one business day. Keep pull requests under 400 changed lines where possible and include tests for new behaviour.
+
+Releases
+We release every Tuesday and Thursday. Release candidates are cut at 10:00 and deployed to production after the smoke tests pass. Hotfixes can be released at any time with approval from the on-call engineer.
+
+Who to ask
+Questions about benefits go to the people team. Questions about access go to IT. Questions about architecture go to the platform channel.

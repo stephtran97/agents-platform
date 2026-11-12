@@ -64,6 +64,10 @@ pnpm --filter @agents-platform/web build
 
 The PostgreSQL and MinIO integration tests require Docker Desktop and running services. They are intentionally not included in the non-integration verification command above.
 
+### Sample data
+
+With the stack running, `pnpm seed` uploads the documents in `scripts/mock-data/` for the `local` tenant used by the web UI and waits for ingestion. It is idempotent (existing filenames are skipped). Options: `--ask` runs a sample question per document, `--tenant <id>`, `--api-url <url>`, `--timeout <seconds>`. With `LLM_PROVIDER=mock`, retrieval is not semantically ranked and answers echo the prompt; use a real provider for meaningful answers.
+
 ### Integration, evaluation, and end-to-end tests
 
 `tests/evaluation/basic-rag.evaluation.test.ts` runs `basic-rag` over the mock provider against `tests/evaluation/fixtures/handbook.txt` and needs no infrastructure. `tests/integration/document-to-answer.test.ts` drives the full upload → ingestion → question → citation flow over HTTP against the running Compose stack (`API_URL`, default `http://localhost:4100`, with `LLM_PROVIDER=mock`); it skips its tests when the API is unreachable.
