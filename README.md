@@ -27,7 +27,15 @@ pnpm typecheck
 pnpm build
 ```
 
-The current Compose file starts the infrastructure dependencies only. The application services are run as separate Node processes during this prototype phase. Default service ports are:
+`docker compose up -d` starts only PostgreSQL and MinIO for host-process development. To run the whole stack with each app in its own container (postgres, minio, minio-init bucket creation, llm, agent, api, worker, web), use:
+
+```powershell
+docker compose up -d --build --wait
+```
+
+The web app is then served at http://localhost:5173 (nginx proxies `/v1` to the `api` container). Inside Compose, services reach each other by service name; `.env` values such as `LLM_PROVIDER`, `OPENAI_API_KEY`, `AGENT_RUNTIME`, and `TENANT_ID` are passed through. All app images are built from the root `Dockerfile` (`--target api|agent|llm|worker|web`).
+
+For host-process development, run the apps as separate Node processes. Default service ports are:
 
 - API: `4100`
 - Agent: `4101`
