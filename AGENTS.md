@@ -48,6 +48,10 @@ Every tenant-owned feature should include isolation coverage. Service-boundary t
 
 Before claiming a change is complete, run `pnpm typecheck`, the relevant focused tests, and `pnpm build` when build behavior is affected. Record infrastructure limitations explicitly.
 
+## Changelog
+
+Update `CHANGELOG.md` every time you touch code (any change under `apps/`, `packages/`, `scripts/`, `tests/`, or build/config files). Add the entry in the same change, under the `Unreleased` heading, in the matching [Keep a Changelog](https://keepachangelog.com) category (`Added`, `Changed`, `Fixed`, `Removed`, `Security`). Write one concise, user-facing line per change. Documentation-only edits do not require an entry.
+
 ## Commit & Pull Request Guidelines
 
 Use concise, imperative commit subjects such as `Add tenant isolation` or `Fix embedding timeout`. Keep unrelated refactors out of feature commits.
