@@ -1,13 +1,14 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import { conversationRequestSchema, type AgentRequest, type AgentResponse } from '@agents-platform/contracts';
 import { AgentClient } from '@agents-platform/clients';
+import { toTenantUuid } from '@agents-platform/domain';
 import { createMemoryStore, type ApiStore } from './store.js';
 import { createPersistentApp } from './persistent.js';
 
 export type AgentService = { answer(request: AgentRequest): Promise<AgentResponse> };
 export function createApp(agent: AgentService = new AgentClient(process.env.AGENT_URL ?? 'http://localhost:4101'), store: ApiStore = createMemoryStore()): FastifyInstance {
   const app = Fastify({ logger: true });
-  function tenantId(request: { headers: Record<string, string | string[] | undefined> }): string { const value = request.headers['x-tenant-id']; return (Array.isArray(value) ? value[0] : value) ?? process.env.TENANT_ID ?? 'local'; }
+  function tenantId(request: { headers: Record<string, string | string[] | undefined> }): string { const value = request.headers['x-tenant-id']; return toTenantUuid(((Array.isArray(value) ? value[0] : value) ?? process.env.TENANT_ID ?? 'local').trim()); }
   app.get('/health', async () => ({ ok: true }));
   app.get('/v1/documents', async (request) => store.listDocuments(tenantId(request)));
   app.get('/v1/documents/:id', async (request, reply) => { const document = await store.getDocument(tenantId(request), (request.params as { id: string }).id); return document ? document : reply.code(404).send({ code: 'DOCUMENT_NOT_FOUND' }); });

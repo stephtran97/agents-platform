@@ -4,6 +4,9 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 
 ## [Unreleased]
 
+### Fixed
+- Document upload and conversations no longer fail against PostgreSQL: documents are filed under a per-tenant default knowledge base UUID (created on demand) instead of the invalid `'default'`, and non-UUID tenant keys such as `local` are mapped to stable tenant UUIDs.
+
 ### Changed
 - Compose now uses `bitnamilegacy/minio` for object storage because `minio/minio` is no longer published on Docker Hub.
 
