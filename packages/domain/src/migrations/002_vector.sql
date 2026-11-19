@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- Keep this vector(1536) declaration in sync with EMBEDDING_DIMENSION in ports/vector-store.ts.
+-- Keep this vector(1536) declaration (see 003_embedding_768.sql for the current size) in sync with EMBEDDING_DIMENSION in ports/vector-store.ts.
 CREATE TABLE document_chunks (
   id uuid PRIMARY KEY,
   tenant_id uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,

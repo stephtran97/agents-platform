@@ -100,8 +100,11 @@ export function createApp(
         answer.citations.map((c) => ({ documentId: c.documentId, chunkId: c.chunkId }))
       );
       return reply.send({ conversationId: id, ...answer });
-    } catch {
-      return reply.code(503).send({ code: 'AGENT_UNAVAILABLE' });
+    } catch (error) {
+      // Stack traces are only exposed outside production (local development aid).
+      const stack =
+        process.env.NODE_ENV !== 'production' && error instanceof Error ? error.stack : undefined;
+      return reply.code(503).send({ code: 'AGENT_UNAVAILABLE', ...(stack && { stack }) });
     }
   });
   return app;

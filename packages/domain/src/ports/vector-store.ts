@@ -1,4 +1,4 @@
-export const EMBEDDING_DIMENSION = 1536;
+export const EMBEDDING_DIMENSION = 768;
 
 export interface DocumentChunkInput {
   id: string;

@@ -36,7 +36,7 @@ describe('LLM gateway routes', () => {
       url: '/v1/embeddings',
       payload: { model: 'm', input: 'hello' }
     });
-    expect(embedded.json().embeddings[0]).toHaveLength(1536);
+    expect(embedded.json().embeddings[0]).toHaveLength(768);
   });
 
   it('rejects requests missing model or input with INVALID_REQUEST', async () => {

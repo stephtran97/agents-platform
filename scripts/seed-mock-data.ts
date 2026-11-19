@@ -16,6 +16,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 const sampleQuestions: Record<string, string> = {
   'company-handbook.md': 'How many vacation days do full-time employees get?',
+  'company-handbook.vi.md': 'Nhân viên toàn thời gian được nghỉ phép bao nhiêu ngày mỗi năm?',
   'product-faq.md': 'What is the refund policy for annual subscriptions?',
   'security-policy.txt': 'How quickly must a security incident be reported?',
   'onboarding-guide.txt': 'On which days do we release?'

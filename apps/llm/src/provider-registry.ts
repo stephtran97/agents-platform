@@ -9,6 +9,9 @@ export type LlmConfig = {
   embeddingModel?: string;
   timeoutMs?: number;
 };
+/** Must match EMBEDDING_DIMENSION in @agents-platform/domain (the pgvector column size). */
+const EMBEDDING_DIMENSIONS = 768;
+
 export function createLlmProvider(config: LlmConfig): LlmProvider {
   if (config.provider === 'mock') return new MockProvider();
   if (config.provider === 'openai' || config.provider === 'azure-openai') {
@@ -19,7 +22,23 @@ export function createLlmProvider(config: LlmConfig): LlmProvider {
       baseUrl: config.baseUrl,
       model: config.model ?? 'gpt-4o-mini',
       embeddingModel: config.embeddingModel ?? 'text-embedding-3-small',
-      timeoutMs: config.timeoutMs
+      timeoutMs: config.timeoutMs,
+      embeddingDimensions: EMBEDDING_DIMENSIONS
+    });
+  }
+  if (config.provider === 'ollama') {
+    // Ollama serves an OpenAI-compatible API and needs no key. Chat and embeddings both
+    // use the local server; callers send OpenAI model names, so the configured models win.
+    // The default embedding model (nomic-embed-text) produces 768-dimensional vectors.
+    return new OpenAiCompatibleProvider({
+      provider: 'ollama',
+      apiKey: '',
+      baseUrl: config.baseUrl ?? 'http://localhost:11434/v1',
+      model: config.model ?? 'qwen3:4b',
+      embeddingModel: config.embeddingModel ?? 'nomic-embed-text',
+      timeoutMs: config.timeoutMs,
+      forceModel: true,
+      forceEmbeddingModel: true
     });
   }
   throw new Error('MODEL_UNAVAILABLE');

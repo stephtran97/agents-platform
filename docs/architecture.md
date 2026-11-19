@@ -67,7 +67,7 @@ sequenceDiagram
     OS-->>W: bytes
     W->>W: extract text, chunkText 1200/120
     W->>L: POST /v1/embeddings (all chunks)
-    L-->>W: embeddings (1536-dim)
+    L-->>W: embeddings (768-dim)
     W->>DB: upsert document_chunks
     W->>DB: documents.status = ready
     W->>DB: job = completed

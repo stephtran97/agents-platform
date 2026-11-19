@@ -76,7 +76,10 @@ describe('conversation history', () => {
       payload: { message: 'hello' }
     });
     expect(response.statusCode).toBe(503);
-    expect(response.json()).toEqual({ code: 'AGENT_UNAVAILABLE' });
+    expect(response.json()).toEqual({
+      code: 'AGENT_UNAVAILABLE',
+      stack: expect.stringContaining('Error: down')
+    });
     expect(await store.listMessages(toTenantUuid('tenant-a'), id)).toEqual([
       { role: 'user', content: 'hello' }
     ]);

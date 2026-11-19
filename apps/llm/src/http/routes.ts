@@ -14,7 +14,14 @@ function defaultProvider(): LlmProvider {
   return createLlmProvider({
     provider: process.env.LLM_PROVIDER ?? 'mock',
     apiKey: process.env.OPENAI_API_KEY ?? process.env.AZURE_OPENAI_API_KEY,
-    baseUrl: process.env.LLM_BASE_URL ?? 'https://api.openai.com/v1'
+    baseUrl:
+      process.env.LLM_BASE_URL ??
+      (process.env.LLM_PROVIDER === 'ollama'
+        ? 'http://localhost:11434/v1'
+        : 'https://api.openai.com/v1'),
+    ...(process.env.LLM_MODEL ? { model: process.env.LLM_MODEL } : {}),
+    ...(process.env.LLM_EMBEDDING_MODEL ? { embeddingModel: process.env.LLM_EMBEDDING_MODEL } : {}),
+    ...(process.env.LLM_TIMEOUT_MS ? { timeoutMs: Number(process.env.LLM_TIMEOUT_MS) } : {})
   });
 }
 

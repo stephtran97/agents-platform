@@ -12,17 +12,20 @@ export function ChatPanel({ ask, disabled = false, disabledReason }: ChatPanelPr
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState<AgentResponse | null>(null);
   const [error, setError] = useState('');
+  const [stack, setStack] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function submit() {
     if (!question.trim() || loading || disabled) return;
     setLoading(true);
     setError('');
+    setStack('');
     try {
       setAnswer(await ask(question));
-    } catch {
+    } catch (caught) {
       setAnswer(null);
       setError('The Q&A service is unavailable.');
+      setStack(caught instanceof Error ? (caught.stack ?? '') : '');
     } finally {
       setLoading(false);
     }
@@ -43,6 +46,12 @@ export function ChatPanel({ ask, disabled = false, disabledReason }: ChatPanelPr
         </button>
         {disabled && disabledReason && <p className="hint">{disabledReason}</p>}
         {error && <p className="error">{error}</p>}
+        {error && stack && (
+          <details>
+            <summary>Stack trace</summary>
+            <pre>{stack}</pre>
+          </details>
+        )}
       </section>
       {answer && (
         <section className="answer">

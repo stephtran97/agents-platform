@@ -11,7 +11,7 @@ it('scopes vector writes and searches to tenant and knowledge base', async () =>
     }
   } as unknown as Pool;
   const store = new PgVectorStore(pool);
-  const embedding = Array.from({ length: 1536 }, (_, index) => (index === 0 ? 1 : 0));
+  const embedding = Array.from({ length: 768 }, (_, index) => (index === 0 ? 1 : 0));
 
   await store.upsertChunks('tenant', 'kb', [
     { id: 'chunk', documentId: 'doc', ordinal: 0, text: 'answer', embedding }
@@ -42,7 +42,7 @@ it('rejects embeddings with the wrong dimension before querying', async () => {
   } as unknown as Pool;
   const store = new PgVectorStore(pool);
 
-  await expect(store.search('tenant', ['kb'], [1], 5)).rejects.toThrow(/1536/);
+  await expect(store.search('tenant', ['kb'], [1], 5)).rejects.toThrow(/768/);
   expect(queried).toBe(false);
 });
 

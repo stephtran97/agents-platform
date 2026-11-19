@@ -40,6 +40,10 @@ describe('loadConfig', () => {
     }
   });
 
+  it('accepts the ollama provider without a secret', () => {
+    expect(loadConfig({ ...requiredEnv, LLM_PROVIDER: 'ollama' }).llmProvider).toBe('ollama');
+  });
+
   it('rejects whitespace-only provider secrets', () => {
     expect(() =>
       loadConfig({ ...requiredEnv, LLM_PROVIDER: 'openai', OPENAI_API_KEY: '  ' })

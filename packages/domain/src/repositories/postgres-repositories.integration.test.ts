@@ -91,7 +91,7 @@ describe('tenant-scoped PostgreSQL adapters', () => {
   });
 
   it('filters vector search by tenant and knowledge base and replaces chunks on retry', async () => {
-    const embedding = Array.from({ length: 1536 }, (_, i) => (i === 0 ? 1 : 0));
+    const embedding = Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0));
     const chunk = { id: randomUUID(), documentId, ordinal: 0, text: 'answer', embedding };
     await vectors.upsertChunks(tenantA.tenantId, kbA, [chunk]);
     await vectors.upsertChunks(tenantA.tenantId, kbA, [{ ...chunk, text: 'updated' }]);
@@ -105,7 +105,7 @@ describe('tenant-scoped PostgreSQL adapters', () => {
   });
 
   it('lists stored chunks per tenant and removes chunks and jobs when a document is deleted', async () => {
-    const embedding = Array.from({ length: 1536 }, (_, i) => (i === 0 ? 1 : 0));
+    const embedding = Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0));
     const chunks = [1, 0].map((ordinal) => ({
       id: randomUUID(),
       documentId,

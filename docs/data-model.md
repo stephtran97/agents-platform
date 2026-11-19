@@ -2,7 +2,7 @@
 
 Migrations live in `packages/domain/src/migrations` and run automatically at API and worker startup.
 
-## Tables (`001_initial.sql`, `002_vector.sql`)
+## Tables (`001_initial.sql`, `002_vector.sql`, `003_embedding_768.sql`)
 
 | Table | Key columns | Notes |
 | --- | --- | --- |
@@ -14,12 +14,12 @@ Migrations live in `packages/domain/src/migrations` and run automatically at API
 | `messages` | `tenant_id`, `conversation_id`, `message jsonb`, `citations jsonb` | Ordered by `(created_at, id)` |
 | `agent_configs`, `model_configs` | `tenant_id`, `name`, `config jsonb` | Reserved; not yet used by code |
 | `ingestion_jobs` | `tenant_id`, `document_id`, `status`, `attempts`, `error` | status ∈ queued/processing/completed/failed; partial index on queued jobs |
-| `document_chunks` | `tenant_id`, `knowledge_base_id`, `document_id`, `ordinal`, `text`, `embedding vector(1536)` | `UNIQUE (tenant_id, document_id, ordinal)`; HNSW index with `vector_cosine_ops` |
+| `document_chunks` | `tenant_id`, `knowledge_base_id`, `document_id`, `ordinal`, `text`, `embedding vector(768)` | `UNIQUE (tenant_id, document_id, ordinal)`; HNSW index with `vector_cosine_ops` |
 | `schema_migrations` | `name`, `applied_at` | Created by `migrate()` |
 
 **Tenant-safety pattern:** every table has `UNIQUE (tenant_id, id)` so children reference `(tenant_id, parent_id)`; a row can never point at another tenant's parent.
 
-**Embedding dimension:** `EMBEDDING_DIMENSION = 1536` in `ports/vector-store.ts` must match `vector(1536)` in `002_vector.sql`. `PgVectorStore` rejects other lengths or non-finite values.
+**Embedding dimension:** `EMBEDDING_DIMENSION = 768` in `ports/vector-store.ts` must match `vector(768)` (created as 1536 in `002_vector.sql`, resized by `003_embedding_768.sql`). `PgVectorStore` rejects other lengths or non-finite values.
 
 
 ### Entity-relationship diagram
@@ -81,7 +81,7 @@ erDiagram
         uuid document_id FK
         int ordinal
         text text
-        vector_1536 embedding
+        vector_768 embedding
     }
     conversations {
         uuid id PK

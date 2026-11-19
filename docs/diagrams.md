@@ -86,7 +86,7 @@ sequenceDiagram
     OS-->>W: bytes
     W->>W: extract text, chunkText 1200/120
     W->>L: POST /v1/embeddings (all chunks)
-    L-->>W: embeddings (1536-dim)
+    L-->>W: embeddings (768-dim)
     W->>DB: upsert document_chunks
     W->>DB: documents.status = ready
     W->>DB: job = completed
@@ -212,7 +212,7 @@ erDiagram
         uuid document_id FK
         int ordinal
         text text
-        vector_1536 embedding
+        vector_768 embedding
     }
     conversations {
         uuid id PK
@@ -310,7 +310,7 @@ classDiagram
     }
     class MockProvider {
         echoes "Mock answer: ..."
-        1536-dim pseudo embeddings
+        768-dim pseudo embeddings
     }
     class OpenAiCompatibleProvider {
         bearer auth

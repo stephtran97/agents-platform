@@ -49,7 +49,7 @@ flowchart TD
 ### `apps/llm` — LLM gateway (Fastify, port 4102)
 - `src/provider-registry.ts` — `createLlmProvider(config)`: `mock`, or `openai`/`azure-openai` (requires API key and base URL, else `MODEL_CONFIGURATION_INVALID`).
 - `src/providers/llm-provider.ts` — `LlmProvider` interface: `complete`, `embed`, `listModels`.
-- `src/providers/mock-provider.ts` — deterministic: echoes `Mock answer: <last message>`, produces 1536-dim pseudo-embeddings from character codes.
+- `src/providers/mock-provider.ts` — deterministic: echoes `Mock answer: <last message>`, produces 768-dim pseudo-embeddings from character codes.
 - `src/providers/http-provider.ts` — OpenAI-compatible HTTP client (`/chat/completions`, `/embeddings`), bearer auth, 15 s default timeout → `MODEL_TIMEOUT` / `MODEL_UNAVAILABLE`.
 - `src/http/routes.ts` — `GET /health`, `POST /v1/completions`, `POST /v1/embeddings`, `GET /v1/models`.
 
@@ -123,7 +123,7 @@ classDiagram
     }
     class MockProvider {
         echoes "Mock answer: ..."
-        1536-dim pseudo embeddings
+        768-dim pseudo embeddings
     }
     class OpenAiCompatibleProvider {
         bearer auth

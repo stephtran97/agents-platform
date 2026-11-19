@@ -1,7 +1,8 @@
 import type { AgentResponse, DocumentDto, DocumentInspectionDto } from '@agents-platform/contracts';
 
 const apiBase = '';
-const headers = { 'content-type': 'application/json', 'x-tenant-id': 'local' };
+const tenantHeaders = { 'x-tenant-id': 'local' };
+const headers = { 'content-type': 'application/json', ...tenantHeaders };
 
 export type DocumentSummary = Pick<DocumentDto, 'id' | 'filename' | 'status' | 'sizeBytes'>;
 
@@ -51,7 +52,12 @@ export async function sendMessage(conversationId: string, message: string): Prom
     headers,
     body: JSON.stringify({ message })
   });
-  if (!response.ok) throw new Error('AGENT_UNAVAILABLE');
+  if (!response.ok) {
+    const body = (await response.json().catch(() => ({}))) as { stack?: unknown };
+    const error = new Error('AGENT_UNAVAILABLE');
+    if (typeof body.stack === 'string') error.stack = body.stack;
+    throw error;
+  }
   return response.json();
 }
 
@@ -68,7 +74,8 @@ export async function getDocumentInspection(id: string): Promise<DocumentInspect
 export async function deleteDocument(id: string): Promise<void> {
   const response = await fetch(`${apiBase}/v1/documents/${encodeURIComponent(id)}`, {
     method: 'DELETE',
-    headers
+    // No content-type: Fastify rejects a JSON content-type with an empty body (400).
+    headers: tenantHeaders
   });
   // A 404 means it is already gone, which is the outcome the caller wants.
   if (!response.ok && response.status !== 404) throw new Error('DELETE_FAILED');

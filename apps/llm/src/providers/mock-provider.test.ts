@@ -9,7 +9,7 @@ describe('MockProvider', () => {
       model: 'mock-chat',
       messages: [{ role: 'user', content: 'What is hello?' }]
     });
-    expect(embedding.embeddings[0]).toHaveLength(1536);
+    expect(embedding.embeddings[0]).toHaveLength(768);
     expect(completion.message.content).toContain('hello');
   });
 });

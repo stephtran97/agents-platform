@@ -11,7 +11,11 @@ const pool = process.env.DATABASE_URL
   ? new Pool({ connectionString: process.env.DATABASE_URL })
   : undefined;
 const retriever = pool ? new VectorRetriever(new PgVectorStore(pool), llm) : undefined;
+const minScore = Number(process.env.RETRIEVAL_MIN_SCORE ?? 0);
+const scoreMargin = Number(process.env.RETRIEVAL_SCORE_MARGIN ?? 0);
 const runtime = createAgentRuntime(process.env.AGENT_RUNTIME ?? 'basic-rag', {
+  minScore: Number.isFinite(minScore) ? minScore : 0,
+  scoreMargin: Number.isFinite(scoreMargin) ? scoreMargin : 0,
   vectorStore: retriever ?? { search: async () => [] },
   llm: {
     complete: async (input) => {

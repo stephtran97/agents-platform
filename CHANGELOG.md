@@ -5,12 +5,26 @@ All notable changes to this project are recorded here. Format follows [Keep a Ch
 ## [Unreleased]
 
 ### Added
+- Vietnamese sample document `company-handbook.vi.md` for `pnpm seed`, with a Vietnamese sample question for `--ask`.
+- `RETRIEVAL_MIN_SCORE` (absolute floor) and `RETRIEVAL_SCORE_MARGIN` (distance below the best hit) drop low-similarity chunks before prompting and citing, so small local models are not distracted by irrelevant sources (both default `0`, off). A high absolute floor such as 0.6 can empty the results because `nomic-embed-text` scores are compressed.
+
+### Changed
+- Embedding vectors are now 768-dimensional (was 1536) so local models work: migration `003_embedding_768.sql` resizes the pgvector column, drops stored chunks and re-queues every existing document for re-embedding. OpenAI/Azure embeddings request 768 dimensions; the mock provider returns 768.
+- The `ollama` provider now embeds with a real local model (`LLM_EMBEDDING_MODEL`, default `nomic-embed-text`) instead of mock vectors, so retrieval is semantic; `docker-compose.ollama.yml` pulls the embedding model too.
+
+### Added
+- `docker-compose.ollama.yml` runs a local Ollama server in Docker and pulls `llama3.2:3b` (override with `OLLAMA_MODEL`/`OLLAMA_PORT`).
+- Chat failures now show the server stack trace in the web app (collapsible "Stack trace"); the API includes `stack` in `503 AGENT_UNAVAILABLE` responses only when `NODE_ENV` is not `production`.
+- `ollama` LLM provider (`LLM_PROVIDER=ollama`, `LLM_BASE_URL`, `LLM_MODEL`) routes chat to a local Ollama server without an API key; embeddings stay on the mock provider because the vector column is 1536-dimensional.
 - Manage uploaded documents in the web app: click a document to see its extracted text beside the chunks the agent searches (chunk boundaries and overlaps highlighted), and delete it with confirmation.
 - `DELETE /v1/documents/:id` removes a document with its stored file, chunks, embeddings and ingestion jobs; `GET /v1/documents/:id/chunks` returns the re-extracted text and stored chunks.
 - Shared VS Code settings (`.vscode`) that format with Prettier and fix ESLint issues on save.
 - ESLint (typescript-eslint, react-hooks) and Prettier with `pnpm lint`, `lint:fix`, `format` and `format:check` scripts; a Husky pre-commit hook runs lint-staged on staged files.
 
 ### Fixed
+- Deleting a document in the web app failed with a 400 because the `DELETE` request carried a JSON content-type with no body; it now sends only the tenant header.
+- `LLM_TIMEOUT_MS` now also sets the upstream provider request timeout (previously fixed at 15s) and is passed through Docker Compose.
+- The OpenAI/Azure provider now maps responses to the gateway contract (it returned raw OpenAI JSON) and sends `max_tokens`/`response_format` correctly.
 - Markdown (`text/markdown`) uploads are now ingested instead of failing as unsupported.
 - Chat now works against the real API: the web client no longer sends the non-UUID `default` knowledge base id, and the API maps `default` to the tenant default knowledge base.
 - LLM gateway returns `400 INVALID_REQUEST` for malformed requests, enforces a gateway-level timeout (`504 MODEL_TIMEOUT`, `LLM_TIMEOUT_MS`), and Azure OpenAI now authenticates with the `api-key` header.

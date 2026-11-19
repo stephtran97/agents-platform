@@ -27,7 +27,7 @@ export class MockProvider implements LlmProvider {
       model: request.model,
       embeddings: values.map((value) =>
         Array.from(
-          { length: 1536 },
+          { length: 768 },
           (_, index) => ((value.charCodeAt(index % Math.max(value.length, 1)) || 0) % 97) / 97
         )
       ),

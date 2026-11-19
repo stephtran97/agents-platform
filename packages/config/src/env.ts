@@ -3,7 +3,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   TENANT_ID: z.string().trim().min(1).default('local-tenant'),
   AGENT_RUNTIME: z.string().trim().min(1).default('basic-rag'),
-  LLM_PROVIDER: z.enum(['mock', 'openai', 'azure-openai']).default('mock'),
+  LLM_PROVIDER: z.enum(['mock', 'openai', 'azure-openai', 'ollama']).default('mock'),
   AGENT_URL: z.string().url().default('http://localhost:3001'),
   LLM_URL: z.string().url().default('http://localhost:3002'),
   DATABASE_URL: z.url(),
@@ -19,7 +19,7 @@ const envSchema = z.object({
 export interface AppConfig {
   tenantId: string;
   agentRuntime: string;
-  llmProvider: 'mock' | 'openai' | 'azure-openai';
+  llmProvider: 'mock' | 'openai' | 'azure-openai' | 'ollama';
   agentUrl: URL;
   llmUrl: URL;
   databaseUrl: URL;
@@ -40,7 +40,11 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
         ? parsed.AZURE_OPENAI_API_KEY
         : undefined;
 
-  if (parsed.LLM_PROVIDER !== 'mock' && !providerSecret?.trim()) {
+  if (
+    parsed.LLM_PROVIDER !== 'mock' &&
+    parsed.LLM_PROVIDER !== 'ollama' &&
+    !providerSecret?.trim()
+  ) {
     throw new Error(`A non-empty secret is required for ${parsed.LLM_PROVIDER}`);
   }
   if (parsed.LLM_PROVIDER === 'azure-openai' && !parsed.AZURE_OPENAI_ENDPOINT) {
